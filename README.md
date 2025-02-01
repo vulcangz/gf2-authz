@@ -1,0 +1,1 @@
+# gf2-authz - GoFrame v2 + GORM + React + Material UI
