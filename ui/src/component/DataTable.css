@@ -1,0 +1,25 @@
+/* Disable header cell on focus */
+div.MuiDataGrid-columnHeader:focus-within {
+    outline: none !important;
+}
+
+/* Column headers */
+div.MuiDataGrid-columnHeaders {
+    background-image: url('/background.svg');
+    color: #ffffff;
+}
+
+div.MuiDataGrid-columnHeaders button.MuiIconButton-root {
+    color: #ffffff;
+    opacity: 0.9;
+}
+
+/* Disable cell border on focus */
+div.MuiDataGrid-row div.MuiDataGrid-cell:focus-within {
+    outline: none !important;
+}
+
+/* Grid rows */
+.datagrid-row-lightgrey {
+    background-color: #fafafa;
+}

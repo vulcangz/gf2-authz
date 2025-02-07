@@ -1,0 +1,20 @@
+*.svg
+.DS_Store
+.dependency-cruiser.js
+
+# production
+/build
+
+# dependencies
+/node_modules
+
+# Vite related dependencies
+.vite
+.swc
+
+# testing
+/coverage
+
+# misc
+*.pem
+*.zip
