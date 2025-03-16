@@ -25,7 +25,7 @@
     "@nivo/bar": "^0.88.0",
     "@nivo/core": "^0.88.0",
     "@nivo/pie": "^0.88.0",
-    "axios": "^1.6.5",
+    "axios": "^1.8.2",
     "gf2-authz": "file:",
     "js-cookie": "^3.0.5",
     "jwt-decode": "^4.0.0",
