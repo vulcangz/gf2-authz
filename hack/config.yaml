@@ -1,0 +1,27 @@
+
+# CLI tool, only in development environment.
+# https://goframe.org/pages/viewpage.action?pageId=3673173
+gfcli:
+  build:
+    name:     "authz"
+    arch:     "amd64"
+    system:   "linux"
+    packSrc:  "resource/public,manifest/config"
+    #packDst:  "packed/build_packed_data.go"
+    mod:      "none"
+    cgo:      0
+    output:   "./bin"
+  docker:
+    build: "-a amd64 -s linux -p temp -ew"
+    tagPrefixes:
+      - my.image.pub/gf2-authz
+
+  gen:
+    dao:
+    - link:     "mysql:root:password@tcp(127.0.0.1:3306)/authz"
+    
+    pbentity:
+    - link:     "mysql:root:password@tcp(127.0.0.1:3306)/authz"
+      removePrefix: "authz_"
+      package: "github.com/vulcangz/gf2-authz/api/pbentity"
+      

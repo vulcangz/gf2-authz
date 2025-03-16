@@ -1,0 +1,57 @@
+FROM golang:1.21-alpine3.19 as backend-builder
+
+WORKDIR /project
+
+COPY ../../api/ ./api/
+COPY ../../internal/ ./internal/
+COPY ../../manifest/config/ ./manifest/config/
+COPY ../../manifest/i18n/ ./manifest/i18n/
+COPY ../../manifest/protobuf/ ./manifest/protobuf/
+COPY ../../vendor/ ./vendor/
+COPY ../../utility/ ./utility/
+COPY ../../go.mod .
+COPY ../../go.sum .
+
+RUN apk add --no-cache gcc musl-dev
+
+RUN --mount=type=cache,target=/go/pkg/mod \
+    --mount=type=cache,target=/root/.cache/go-build \
+    CGO_ENABLED=1 go build -mod vendor -ldflags "-s -w" -o authz ./cmd/
+
+FROM node:21.6-alpine3.18 as frontend-builder
+
+ARG REACT_APP_API_BASE_URI=http://localhost:8080/v1
+ARG REACT_APP_DEMO_ENABLED=false
+
+ENV REACT_APP_API_BASE_URI=$REACT_APP_API_BASE_URI
+ENV REACT_APP_DEMO_ENABLED=$REACT_APP_DEMO_ENABLED
+
+WORKDIR /app
+
+COPY ../../ui/public ./public/
+COPY ../../ui/src ./src/
+COPY ../../ui/package.json .
+COPY ../../ui/package-lock.json .
+COPY ../../ui/tsconfig.json .
+
+RUN npm install --force && \
+    npm run build
+
+FROM nginxinc/nginx-unprivileged:1.25-alpine
+
+ARG GRPC_SERVER_ADDR=:8081
+ARG HTTP_SERVER_ADDR=:8080
+ARG NGINX_VHOST=./frontend/.docker/vhost.conf
+
+ENV GRPC_SERVER_ADDR=$GRPC_SERVER_ADDR
+ENV HTTP_SERVER_ADDR=$HTTP_SERVER_ADDR
+
+COPY --from=backend-builder /project/authz /authz
+COPY --from=frontend-builder /app/build /usr/share/nginx/html
+
+COPY cmd.sh /cmd.sh
+COPY ${NGINX_VHOST} /etc/nginx/conf.d/default.conf
+
+EXPOSE 80 ${GRPC_SERVER_ADDR} ${HTTP_SERVER_ADDR}
+
+ENTRYPOINT [ "/cmd.sh" ]

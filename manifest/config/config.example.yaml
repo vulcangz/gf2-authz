@@ -1,0 +1,104 @@
+app:
+  name: "authz"
+  audit:
+    cleanDaysToKeep: "7" #Audit logs number of days to keep in database
+    cleanDelay: "1h" #Audit logs clean delay
+    flushDelay: "3s" #Delay in which audit logs will be batch into database
+    resourceKindRegex: ".*"  #Filter which resource kind will be added on audit logs
+  metrics:
+    enabled: true #Enable Prometheus metrics observability (available under `/v1/metrics` URL)
+  trace:
+    enabled: false #Enable tracing observability using OpenTelemetry
+    exporter: "jaeger" #Exporter you want to use. Could be `jaeger`, `zipkin` or `otlpgrpc`
+    jaegerEndpoint: "localhost:4317"  #Jaeger endpoint to be used
+    oTLPDialTimeout: "3s"  #OTLP gRPC exporter dial timeout value
+    oTLPEndpoint: "localhost:30080"  #OTLP gRPC endpoint value
+    sampleRatio: "1.0" #Sampling ratio value defines how many traces should be sent to your exporter
+    zipkinURL: "http://localhost:9411/api/v2/spans"  #Zipkin API URL to be used
+  stats:
+    cleanDaysToKeep: "30"  #Statistics number of days to keep in database
+    cleanDelay: "1h" #Statistics clean delay
+    flushDelay: "3s" #Delay in which statistics will be batch into database
+    rsourceKindRegex: ".*"  #Filter which resource kind will be added on statistics
+  
+user:  
+  adminDefaultPassword: "changeme"  #Default admin password updated on app launch
+
+server:
+  address: ":8080"
+  openapiPath: "/api.json"
+  swaggerPath: "/swagger"
+  CORSAllowedCredentials: true
+  CORSAllowedDomains: "http://localhost:3000"
+  CORSAllowedHeaders: "Authorization,Origin,Content-Length,Content-Type"
+  CORSAllowedMethods: "GET,POST,PATCH,PUT,DELETE,HEAD,OPTIONS" 
+  CORSCacheMaxAge: "12h"
+  DumpRouterMap: true
+  routeOverWrite: true
+  logPath: "logs/server"
+  ErrorStack: true                            # 当Server捕获到异常时是否记录堆栈信息到日志中。默认为true
+  ErrorLogEnabled: true                       # 是否记录异常日志信息到日志中。默认为true
+  errorLogPattern: "error/{Y-m-d}.log"        # 异常错误日志文件格式。默认为"error-{Ymd}.log"
+  accessLogEnabled: true                      # 是否记录访问日志。默认为false
+  accessLogPattern: "access/{Y-m-d}.log"      # 访问日志文件格式。默认为"access-{Ymd}.log"
+  serverAgent: "Authz HTTP Server"
+
+grpc:
+  name:             "authz"  # 服务名称
+  address:          ":8081" # 自定义服务监听地址
+  logPath:          "./logs/grpc" # 日志存储目录路径
+  logStdout:        true    # 日志是否输出到终端
+  errorLogEnabled:  true    # 是否开启错误日志记录
+  accessLogEnabled: true    # 是否开启访问日志记录
+  errorStack:       true    # 当产生错误时，是否记录错误堆栈
+  
+  registry:
+    schema: "file"  # file or etcd
+    endpoints: ["127.0.0.1:2379"]
+    dialTimeout: 5
+  
+logger:
+  level: "all"
+  path: "./logs/"
+  file: "{Y-m-d}.log"
+  stdout: true
+  rotateSize: "100M"
+  rotateBackupLimit: 10
+  rotateBackupExpire: "10d"
+  rotateBackupCompress: 9
+  rotateCheckInterval: "24h"
+
+redis:
+  default:
+    address: 127.0.0.1:6379
+    db: 1
+    pass: dev
+
+# Database.
+database:
+  driver: "mysql"
+  user: "root"
+  password: "password"
+  host: "127.0.0.1"
+  port: "3306"
+  name: "authz"
+  ssl: disable
+  timezone: "UTC"    
+
+event:
+  dispatcherChannelSize: "10000" #Event dispatcher channel size
+
+auth:
+  accessTokenDuration: "6h" #Access token duration
+  domain: "http://localhost:8080" #OAuth domain to be used
+  jwtSignString: "4uthz-s3cr3t-valu3-pl3as3-ch4ng3!" #Default HMAC to use for JWT tokens
+  refreshTokenDuration: "6h" #Refresh token duration
+
+oauth:
+  #provider: "github"
+  clientId: "changme"  #OAuth client ID provided by your issuer
+  clientSecret: "changme"  #OAuth client Secret provider by your issuer
+  cookiesDomainName: "localhost" #OAuth domain name on which cookies will be stored
+  frontendRedirectURL: "http://localhost:3000" #Frontend redirect URL when OAuth authentication is successful
+  redirectURL: "http://localhost:8080/v1/oauth/callback" #Backend OAuth callback URL
+  scopes: "read:org"  #OAuth scopes to be retrieved from your issuer

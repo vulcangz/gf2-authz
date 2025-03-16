@@ -1,0 +1,22 @@
+// ==========================================================================
+// Code generated and maintained by GoFrame CLI tool. DO NOT EDIT.
+// ==========================================================================
+
+syntax = "proto3";
+
+package pbentity;
+
+option go_package = "github.com/vulcangz/gf2-authz/api/pbentity";
+
+import "google/protobuf/timestamp.proto";
+
+message Audits {
+    int64                     Id            = 1; //
+    google.protobuf.Timestamp Date          = 2; //
+    string                    Principal     = 3; //
+    string                    ResourceKind  = 4; //
+    string                    ResourceValue = 5; //
+    string                    Action        = 6; //
+    int64                     IsAllowed     = 7; //
+    string                    PolicyId      = 8; //
+}

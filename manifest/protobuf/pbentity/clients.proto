@@ -1,0 +1,21 @@
+// ==========================================================================
+// Code generated and maintained by GoFrame CLI tool. DO NOT EDIT.
+// ==========================================================================
+
+syntax = "proto3";
+
+package pbentity;
+
+option go_package = "github.com/vulcangz/gf2-authz/api/pbentity";
+
+import "google/protobuf/timestamp.proto";
+
+message Clients {
+    string                    Id        = 1; //
+    string                    Secret    = 2; //
+    string                    Name      = 3; //
+    string                    Domain    = 4; //
+    string                    Data      = 5; //
+    google.protobuf.Timestamp CreatedAt = 6; //
+    google.protobuf.Timestamp UpdatedAt = 7; //
+}

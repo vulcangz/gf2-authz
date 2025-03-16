@@ -1,0 +1,16 @@
+// ==========================================================================
+// Code generated and maintained by GoFrame CLI tool. DO NOT EDIT.
+// ==========================================================================
+
+syntax = "proto3";
+
+package pbentity;
+
+option go_package = "github.com/vulcangz/gf2-authz/api/pbentity";
+
+
+
+message ResourcesAttributes {
+    string ResourceId  = 1; //
+    int64  AttributeId = 2; //
+}
