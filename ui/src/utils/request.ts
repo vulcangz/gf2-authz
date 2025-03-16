@@ -25,10 +25,8 @@ import type {
   AxiosError,
 } from 'axios';
 
-import { useNavigate } from 'react-router-dom';
 import { AuthenticationToken, AuthenticationUser } from 'context/auth';
 import { errorCodeStore } from 'stores';
-import { useToast } from 'context/toast';
 
 import Storage from './storage';
 
@@ -36,7 +34,6 @@ const baseConfig = {
   baseURL:
     import.meta.env.MODE === 'development' ? '' : import.meta.env.REACT_APP_API_URL,
   timeout: 10000,
-  withCredentials: true,
 };
 
 interface ApiConfig extends AxiosRequestConfig {
@@ -81,8 +78,6 @@ class Request {
           config: errConfig,
         } = error.response || {};
         const { data = {}, msg = '' } = errBody || {};
-        const navigate = useNavigate();
-        const toast = useToast();
 
         const errorObject: {
           code: any;
@@ -103,11 +98,6 @@ class Request {
             return Promise.reject(errorObject);
           }
           if (data?.err_type) {
-            if (data.err_type === 'toast') {
-              // toast error message
-              toast.warning(msg);
-            }
-
             if (data.err_type === 'alert') {
               return Promise.reject({
                 msg,
@@ -126,8 +116,6 @@ class Request {
           }
 
           if (!data || Object.keys(data).length <= 0) {
-            // default error msg will show modal
-            toast.error(msg);
             return Promise.reject(false);
           }
         }
@@ -136,7 +124,8 @@ class Request {
           // clear userinfo
           errorCodeStore.getState().reset();
           localStorage.removeItem(AuthenticationUser);
-          navigate('/signin');
+          // navigate('/signin');
+          location.href='/signin';
           return Promise.reject(false);
         }
 
@@ -144,16 +133,18 @@ class Request {
           // Permission interception
           if (data?.type === 'url_expired') {
             // url expired  '/signin'
-            navigate('/signin');
+            
+          location.href='/signin';
             return Promise.reject(false);
           }
           if (data?.type === 'inactive') {
             // inactivated
-            navigate('/signin');
+            
+          location.href='/signin';
           }
 
-          if (data?.type === 'suspended') {
-            navigate('/signin');
+          if (data?.type === 'suspended') {            
+          location.href='/signin';
             return Promise.reject(false);
           }
 
@@ -163,7 +154,7 @@ class Request {
           }
 
           if (msg) {
-            toast.warning(msg);
+            console.log(msg);
           }
           return Promise.reject(false);
         }
