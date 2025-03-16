@@ -2,20 +2,18 @@ module github.com/vulcangz/gf2-authz
 
 go 1.23.0
 
-toolchain go1.23.4
+toolchain go1.24.1
 
 require (
-	github.com/blang/semver v2.2.0+incompatible
 	github.com/coreos/go-oidc/v3 v3.11.0
 	github.com/cucumber/godog v0.12.6
 	github.com/go-oauth2/oauth2/v4 v4.5.2
 	github.com/gogf/gf/contrib/registry/etcd/v2 v2.8.3
 	github.com/gogf/gf/contrib/rpc/grpcx/v2 v2.8.3
 	github.com/gogf/gf/v2 v2.8.3
-	github.com/golang-jwt/jwt/v4 v4.5.0
+	github.com/golang-jwt/jwt/v4 v4.5.1
 	github.com/golang/mock v1.6.0
 	github.com/google/uuid v1.6.0
-	github.com/grpc-ecosystem/go-grpc-middleware v1.4.0
 	github.com/grpc-ecosystem/go-grpc-middleware/v2 v2.1.0
 	github.com/prometheus/client_golang v1.20.5
 	github.com/spf13/pflag v1.0.5
