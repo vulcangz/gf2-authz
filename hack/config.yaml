@@ -10,11 +10,12 @@ gfcli:
     #packDst:  "packed/build_packed_data.go"
     mod:      "none"
     cgo:      0
-    output:   "./bin"
+    output:   "./temp/authz"
   docker:
     build: "-a amd64 -s linux -p temp -ew"
+    tagName: v0.1.0-standalone
     tagPrefixes:
-      - my.image.pub/gf2-authz
+      - vz
 
   gen:
     dao:
