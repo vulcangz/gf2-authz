@@ -15,8 +15,8 @@ import (
 func main() {
 	// Initialize client
 	authzClient, err := sdk.NewClient(&sdk.Config{
-		ClientID:       "7ea9dc48-0274-11f0-a97a-5254004d77d3",
-		ClientSecret:   "pnILDXBRJ_EaldjyS4_dzwEut79kd2sDkpcE69-AAXoqQK1M",
+		ClientID:       "cab02d47-03f2-11f0-a218-0242ac110002",
+		ClientSecret:   "bIY37jTBQR_BcB17PXVr5M-qB1CgkPfO4fTaG4zqaETY8q5g",
 		GrpcAddr:       "127.0.0.1:8081",
 		ServiceName:    "authz",
 		RegistrySchema: "file",
