@@ -17,21 +17,28 @@ import (
 
 var (
 	tokenManager jwt.Manager
-	authCfg      *entity.AuthConfig
+	// authCfg      *entity.AuthConfig
 )
 
 func init() {
-	var clock ctime.Clock
+	var (
+		clock   ctime.Clock
+		authCfg *entity.AuthConfig
+	)
+
 	if gmode.IsTesting() {
 		clock = ctime.NewStaticClock()
 	} else {
 		clock = ctime.NewClock()
 	}
 
-	_ = g.Cfg().MustGet(context.Background(), "auth").Scan(&authCfg)
-	if authCfg == nil {
+	// authCfg, _ = service.SysConfig().GetAuth(context.Background())
+	val, err := g.Cfg().Get(context.Background(), "auth")
+	if err != nil || val == nil {
 		model := &entity.AuthConfig{}
 		authCfg = model.DefaultConfig()
+	} else {
+		val.Scan(&authCfg)
 	}
 
 	tokenManager = jwt.NewManager(authCfg, clock)

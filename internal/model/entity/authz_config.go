@@ -1,8 +1,11 @@
 package entity
 
 import (
+	"context"
 	"fmt"
 	"time"
+
+	"github.com/gogf/gf/v2/frame/g"
 )
 
 const (
@@ -10,6 +13,8 @@ const (
 	DriverMysql    = "mysql"
 	DriverSqlite   = "sqlite"
 )
+
+var appName string
 
 type AppConfig struct {
 	Name    string     `json:"Name"`
@@ -47,8 +52,20 @@ type AppTrace struct {
 	SampleRatio     float64       `json:"sampleRatio"`
 }
 
+func init() {
+	val, err := g.Cfg().Get(context.Background(), "app.name", "authz")
+	if err != nil || val == nil {
+		model := &AppConfig{}
+		conf := model.DefaultConfig()
+		appName = conf.Name
+	} else {
+		appName = val.String()
+	}
+}
+
 func (AppConfig) DefaultConfig() *AppConfig {
 	return &AppConfig{
+		Name: "authz",
 		Audit: AppAudit{
 			CleanDelay:        1 * time.Hour,
 			CleanDaysToKeep:   7,
@@ -165,11 +182,15 @@ type GRPCRegistyConfig struct {
 func (GRPCServerConfig) DefaultConfig() *GRPCServerConfig {
 	return &GRPCServerConfig{
 		Address: ":8081",
+		Registry: &GRPCRegistyConfig{
+			Schema: "file",
+		},
 	}
 }
 
 type HTTPServerConfig struct {
 	Address              string        `json:"address"`
+	ServerRoot           string        `json:"serverRoot"`
 	CORSAllowedDomains   []string      `json:"corsAllowedDomains"`
 	CORSAllowedMethods   []string      `json:"corsAllowedMethods"`
 	CORSAllowedHeaders   []string      `json:"corsAllowedHeaders"`
@@ -179,7 +200,8 @@ type HTTPServerConfig struct {
 
 func (HTTPServerConfig) DefaultConfig() *HTTPServerConfig {
 	return &HTTPServerConfig{
-		Address: ":8080",
+		Address:    ":8080",
+		ServerRoot: "resource/public",
 	}
 }
 

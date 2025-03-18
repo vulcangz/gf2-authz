@@ -11,6 +11,7 @@ import (
 	"github.com/vulcangz/gf2-authz/internal/lib/ctime"
 	"github.com/vulcangz/gf2-authz/internal/model"
 	"github.com/vulcangz/gf2-authz/internal/model/entity"
+	"github.com/vulcangz/gf2-authz/internal/service"
 )
 
 var JWTManager Manager
@@ -57,7 +58,8 @@ func (m *manager) Generate(identifier string) (*Token, error) {
 	now := m.clock.Now()
 	ctx := gctx.New()
 	expireAt := now.Add(m.cfg.AccessTokenDuration)
-	appName := g.Cfg().MustGet(ctx, "app.name").String()
+	appCfg, _ := service.SysConfig().GetApp(ctx)
+	appName := appCfg.Name
 	claims := &Claims{
 		RegisteredClaims: jwt.RegisteredClaims{
 			Issuer:    appName,
@@ -97,7 +99,8 @@ func (m *manager) Parse(accessToken string) (*Claims, error) {
 }
 
 func Init(ctx context.Context) {
-	authCfg, _ := getAuthConfig(ctx)
+	authCfg, _ := service.SysConfig().GetAuth(ctx)
+	// authCfg, _ := getAuthConfig(ctx)
 	var clock ctime.Clock
 	if gmode.IsTesting() {
 		clock = ctime.NewStaticClock()
@@ -109,10 +112,19 @@ func Init(ctx context.Context) {
 
 // GetAuth get auth configuration options
 func getAuthConfig(ctx context.Context) (conf *entity.AuthConfig, err error) {
-	err = g.Cfg().MustGet(ctx, "auth").Scan(&conf)
-	if conf == nil {
+	// err = g.Cfg().MustGet(ctx, "auth").Scan(&conf)
+	// if conf == nil {
+	// 	model := &entity.AuthConfig{}
+	// 	conf = model.DefaultConfig()
+	// }
+
+	val, err := g.Cfg().Get(ctx, "auth")
+	if err != nil || val == nil {
 		model := &entity.AuthConfig{}
 		conf = model.DefaultConfig()
+		return
 	}
+
+	err = val.Scan(&conf)
 	return
 }

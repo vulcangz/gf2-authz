@@ -34,70 +34,102 @@ func (s *sSysConfig) LoadConfig(ctx context.Context) (err error) {
 
 // GetApp get application(authz) configuration options
 func (s *sSysConfig) GetApp(ctx context.Context) (conf *entity.AppConfig, err error) {
-	err = g.Cfg().MustGet(ctx, "app").Scan(&conf)
-	if conf == nil {
+	val, err := g.Cfg().Get(ctx, "app")
+	if err != nil || val == nil {
 		model := &entity.AppConfig{}
 		conf = model.DefaultConfig()
+		return
 	}
+
+	err = val.Scan(&conf)
 	return
 }
 
 // GetAuth get auth configuration options
 func (s *sSysConfig) GetAuth(ctx context.Context) (conf *entity.AuthConfig, err error) {
-	err = g.Cfg().MustGet(ctx, "auth").Scan(&conf)
-	if conf == nil {
+	val, err := g.Cfg().Get(ctx, "auth")
+	if err != nil || val == nil {
 		model := &entity.AuthConfig{}
 		conf = model.DefaultConfig()
+		return
 	}
+
+	err = val.Scan(&conf)
 	return
 }
 
-// GetDatabase get database configuration options
 func (s *sSysConfig) GetDatabase(ctx context.Context) (conf *entity.DatabaseConfig, err error) {
-	err = g.Cfg().MustGet(ctx, "database").Scan(&conf)
-	if conf == nil {
+	val, err := g.Cfg().GetWithEnv(ctx, "database")
+	if err != nil {
 		model := &entity.DatabaseConfig{}
 		conf = model.DefaultConfig()
+		return
 	}
+
+	if val != nil {
+		val.Scan(&conf)
+		return
+	}
+
+	// container env setup for sqlite
+	val = g.Cfg().MustGetWithEnv(ctx, "database.driver", "sqlite")
+	driver := val.String()
+	if driver == "sqlite" {
+		name := g.Cfg().MustGetWithEnv(ctx, "database.dbname", ":memory:")
+		conf = &entity.DatabaseConfig{
+			Driver: driver,
+			Dbname: name.String(),
+		}
+		return
+	}
+
 	return
 }
 
 // GetGRPCServer get GRPCServer configuration options
 func (s *sSysConfig) GetGRPCServer(ctx context.Context) (conf *entity.GRPCServerConfig, err error) {
-	err = g.Cfg().MustGet(ctx, "grpc").Scan(&conf)
-	if conf == nil {
+	val, err := g.Cfg().Get(ctx, "grpc")
+	if err != nil || val == nil {
 		model := &entity.GRPCServerConfig{}
 		conf = model.DefaultConfig()
 	}
+
+	err = val.Scan(&conf)
 	return
 }
 
 // GetUpload get HTTPServer configuration options
 func (s *sSysConfig) GetHTTPServer(ctx context.Context) (conf *entity.HTTPServerConfig, err error) {
-	err = g.Cfg().MustGet(ctx, "server").Scan(&conf)
-	if conf == nil {
+	val, err := g.Cfg().Get(ctx, "server")
+	if err != nil || val == nil {
 		model := &entity.HTTPServerConfig{}
 		conf = model.DefaultConfig()
 	}
+
+	err = val.Scan(&conf)
 	return
 }
 
 // GetOAuth get OAuth2 configuration options
 func (s *sSysConfig) GetOAuth(ctx context.Context) (conf *entity.OAuthConfig, err error) {
-	err = g.Cfg().MustGet(ctx, "oauth").Scan(&conf)
-	if conf == nil {
+	val, err := g.Cfg().Get(ctx, "oauth")
+	if err != nil || val == nil {
 		model := &entity.OAuthConfig{}
 		conf = model.DefaultConfig()
 	}
+
+	err = val.Scan(&conf)
 	return
 }
 
 // GetOAuth get OAuth2 configuration options
 func (s *sSysConfig) GetUser(ctx context.Context) (conf *entity.UserConfig, err error) {
-	err = g.Cfg().MustGet(ctx, "user").Scan(&conf)
-	if conf == nil {
+	val, err := g.Cfg().Get(ctx, "user")
+	if err != nil || val == nil {
 		model := &entity.UserConfig{}
 		conf = model.DefaultConfig()
 	}
+
+	err = val.Scan(&conf)
 	return
 }

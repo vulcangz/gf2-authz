@@ -4,13 +4,13 @@ import (
 	"context"
 	"errors"
 
+	"github.com/glebarez/sqlite"
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/util/gmode"
 	"github.com/vulcangz/gf2-authz/internal/lib/ctime"
 	"github.com/vulcangz/gf2-authz/internal/model/entity"
 	"gorm.io/driver/mysql"
 	"gorm.io/driver/postgres"
-	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 	gormLogger "gorm.io/gorm/logger"
 )
@@ -71,7 +71,7 @@ func Initialize(ctx context.Context, clock ctime.Clock) (db *gorm.DB, err error)
 	// Ping
 	err = sqlDB.Ping()
 	if err == nil {
-		g.Log().Line().Infof(ctx, "database is alive!\n")
+		g.Log().Line().Infof(ctx, "%s database is alive!\n", dbConfig.Driver)
 	}
 
 	dbInstance = db.Debug() //debug模式，打印sql语句
@@ -104,11 +104,29 @@ func GetTestDatabase(ctx context.Context) *gorm.DB {
 
 // GetDatabase get database configuration options
 func GetDatabaseConfig(ctx context.Context) (conf *entity.DatabaseConfig, err error) {
-	err = g.Cfg().MustGet(ctx, "database").Scan(&conf)
-	if conf == nil {
+	val, err := g.Cfg().GetWithEnv(ctx, "database")
+	if err != nil {
 		model := &entity.DatabaseConfig{}
 		conf = model.DefaultConfig()
+		return
 	}
+	if val != nil {
+		err = val.Scan(&conf)
+		return
+	}
+
+	// container env setup for sqlite
+	val = g.Cfg().MustGetWithEnv(ctx, "database.driver", "sqlite")
+	driver := val.String()
+	if driver == "sqlite" {
+		name := g.Cfg().MustGetWithEnv(ctx, "database.dbname", ":memory:")
+		conf = &entity.DatabaseConfig{
+			Driver: driver,
+			Dbname: name.String(),
+		}
+		return
+	}
+
 	return
 }
 

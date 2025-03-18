@@ -38,7 +38,7 @@ var (
 
 			c := grpcx.Server.NewConfig()
 
-			if cfg.Registry.Schema == "etcd" {
+			if cfg.Registry != nil && cfg.Registry.Schema == "etcd" {
 				addr := ""
 				if len(cfg.Registry.Endpoints) > 1 {
 					addr = gstr.Join(cfg.Registry.Endpoints, ",")

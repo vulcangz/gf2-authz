@@ -16,7 +16,7 @@ import (
 
 var (
 	Client = cClient{}
-	domain = g.Cfg().MustGet(context.Background(), "auth.domain").String()
+	// domain = g.Cfg().MustGet(context.Background(), "auth.domain").String()
 )
 
 type cClient struct{}
@@ -34,7 +34,9 @@ type cClient struct{}
 //	@Router		/v1/clients [Post]
 func (c *cClient) Create(ctx context.Context, req *v1.CreateReq) (res *v1.CreateRes, err error) {
 	r := g.RequestFromCtx(ctx)
-	client, err := service.ClientManager().Create(ctx, req.Name, domain)
+
+	authCfg, _ := service.SysConfig().GetAuth(ctx)
+	client, err := service.ClientManager().Create(ctx, req.Name, authCfg.Domain)
 
 	if err != nil {
 		response.ReturnError(r, http.StatusBadRequest, err)

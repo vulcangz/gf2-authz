@@ -7,6 +7,7 @@ import (
 
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/vulcangz/gf2-authz/internal/lib/ctime"
+	"github.com/vulcangz/gf2-authz/internal/model/entity"
 )
 
 var (
@@ -35,7 +36,8 @@ func NewDispatcher(
 ) *dispatcher {
 	once.Do(func() {
 		if eventChanSize == 0 {
-			eventChanSize = g.Cfg().MustGet(context.Background(), "event.dispatcherChannelSize").Int()
+			ev, _ := GetEventConfig(context.Background())
+			eventChanSize = ev.DispatcherEventChannelSize
 		}
 
 		instance = &dispatcher{
@@ -104,4 +106,17 @@ func (n *dispatcher) Unsubscribe(eventType EventType, eventChanToClose chan *Eve
 	}
 
 	return nil
+}
+
+// GetEventConfig get event configuration options
+func GetEventConfig(ctx context.Context) (conf *entity.EventConfig, err error) {
+	val, err := g.Cfg().Get(ctx, "event")
+	if err != nil || val == nil {
+		model := &entity.EventConfig{}
+		conf = model.DefaultConfig()
+		return
+	}
+
+	err = val.Scan(&conf)
+	return
 }

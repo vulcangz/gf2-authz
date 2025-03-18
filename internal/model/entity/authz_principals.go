@@ -1,16 +1,8 @@
 package entity
 
 import (
-	"context"
 	"fmt"
 	"time"
-
-	"github.com/gogf/gf/v2/frame/g"
-)
-
-var (
-	ctx     = context.Background()
-	appName = g.Cfg().MustGet(ctx, "app.name").String()
 )
 
 // Principal is the golang structure for table authz_principals.

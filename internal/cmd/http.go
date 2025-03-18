@@ -37,6 +37,13 @@ var (
 		Func: func(ctx context.Context, parser *gcmd.Parser) (err error) {
 			s := g.Server()
 			// s.SetServerRoot("resource/public")
+			sCfg, _ := service.SysConfig().GetHTTPServer(ctx)
+			if sCfg != nil {
+				s.SetConfigWithMap(g.Map{
+					"Address":    sCfg.Address,
+					"ServerRoot": sCfg.ServerRoot,
+				})
+			}
 
 			s.Use(
 				service.Middleware().MiddlewareCORS,
