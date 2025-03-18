@@ -37,17 +37,7 @@ func NewSubscriber(
 	dispatcher event.Dispatcher,
 ) *subscriber {
 	ctx := context.Background()
-	// d1 := g.Cfg().MustGet(ctx, "app.audit.flushDelay").String()
-	// afd, _ := str2duration.ParseDuration(d1)
-	// d2 := g.Cfg().MustGet(ctx, "app.stats.flushDelay").String()
-	// sfd, _ := str2duration.ParseDuration(d2)
-
 	appCfg, _ := service.SysConfig().GetApp(ctx)
-	// meter := gmetric.GetGlobalProvider().Meter(gmetric.MeterOption{
-	// 	Instrument:        "authz.metric.basic",
-	// 	InstrumentVersion: "v1.0",
-	// })
-	// obs, _ := metric.NewObserver(appCfg, meter)
 	obs, _ := metric.NewObserver(appCfg)
 
 	return &subscriber{
@@ -58,9 +48,6 @@ func NewSubscriber(
 		resourceKindRegex: regexp.MustCompile(appCfg.Stats.ResourceKindRegex),
 		metricEnabled:     appCfg.Metrics.Enabled,
 		observer:          obs,
-		// flushDelay:        afd,
-		// statsFlushDelay:   sfd,
-		// resourceKindRegex: regexp.MustCompile(g.Cfg().MustGet(context.Background(), "app.stats.resourceKindRegex").String()),
 	}
 }
 
@@ -129,7 +116,6 @@ func (s *subscriber) handlePolicyEvents(eventChan chan *event.Event) {
 		}
 
 		policy := itemEvent.Data.(*entity.Policy)
-
 		if err := s.compiler.CompilePolicy(context.Background(), policy); err != nil {
 			g.Log().Warning(context.Background(),
 				"Compiler: unable to compile policy",
@@ -152,7 +138,6 @@ func (s *subscriber) handleResourceEvents(eventChan chan *event.Event) {
 		}
 
 		resource := itemEvent.Data.(*entity.Resource)
-
 		if err := s.compiler.CompileResource(resource); err != nil {
 			g.Log().Warning(context.Background(),
 				"Compiler: unable to compile resource",
@@ -175,7 +160,6 @@ func (s *subscriber) handlePrincipalEvents(eventChan chan *event.Event) {
 		}
 
 		principal := itemEvent.Data.(*entity.Principal)
-
 		if err := s.compiler.CompilePrincipal(principal); err != nil {
 			g.Log().Warning(context.Background(),
 				"Compiler: unable to compile principal",

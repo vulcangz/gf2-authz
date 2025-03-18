@@ -17,8 +17,10 @@ bin/
 cbuild
 */.DS_Store
 main
+authz
 .vscode
 *.txt
+*.exe
 temp/
 ui/
 resource/public

@@ -74,8 +74,6 @@ func Initialize(ctx context.Context, clock ctime.Clock) (db *gorm.DB, err error)
 		g.Log().Line().Infof(ctx, "%s database is alive!\n", dbConfig.Driver)
 	}
 
-	dbInstance = db.Debug() //debug模式，打印sql语句
-
 	return dbInstance, nil
 }
 

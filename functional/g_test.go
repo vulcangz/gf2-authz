@@ -37,8 +37,7 @@ func testServer() {
 
 	s := g.Server()
 
-	s.Use(service.Middleware().Ctx,
-		service.Middleware().MiddlewareCORS,
+	s.Use(service.Middleware().MiddlewareCORS,
 		ghttp.MiddlewareHandlerResponse)
 
 	// Remove all builtin metrics that are produced by prometheus client.
@@ -178,7 +177,6 @@ func initComponents(ctx context.Context) {
 
 func hookForAuthorization(r *ghttp.Request) {
 	action := gstr.ToLower(r.Method)
-
 	if action != "options" {
 		seg := ""
 		act := ""
@@ -217,6 +215,5 @@ func hookForAuthorization(r *ghttp.Request) {
 		r.SetCtxVar(consts.ResourceKindKey, ResourcesAndActionsByMethod[k][0])
 		r.SetCtxVar(consts.ResourceValueKey, r.GetParam("identifier", "*").String())
 		r.SetCtxVar(consts.ActionKey, ResourcesAndActionsByMethod[k][1])
-
 	}
 }
