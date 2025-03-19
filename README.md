@@ -24,7 +24,6 @@ You can use both Role-Based Acccess Control (RBAC) and Attribute-Based Access Co
 
 🕵️‍♂️  Observability: Retrieve metrics and tracing data into your prefered tools
 
-
 ## SDKs
 
 In order to help you, we have the following available SDKs:
@@ -35,7 +34,58 @@ In order to help you, we have the following available SDKs:
 Please check their documentations for detailled usage. They all use `gRPC` for communicating with the Authz backend (server-to-server).
 
 ## Getting started
-TODO...
+
+To get started with this project, run
+
+### Running with default config
+
+No configuration is required. 
+
+#### STEP 1: Backend
+
+```bash
+  git clone https://github.com/vulcangz/gf2-authz.git
+  cd gf2-authz
+  go mod tidy
+  go run main.go
+```
+
+The system then runs with the default config, using SQLite in-memory database.
+
+
+
+#### STEP 2: Admin Dashboard(UI)
+
+```bash
+  cd ui
+  pnpm i
+  pnpm dev
+```
+
+visiting http://localhost:3000
+
+Sign in with default credentials: `admin` / `changeme`.
+
+#### STEP 3: Examples blog
+
+1. Create a service account under menu `Service accounts` in dashboard.
+2. Edit [main.go](https://github.com/vulcangz/gf2-authz/blob/main/examples/blog/main.go#L18-L19). Replace the `client_id`, `client_secret` which obtained in the previous step.
+3. Edit the principal(name: `auth-sa-(your service account name)`). Assign a role(`authz-admin`) to it.
+4. Run the test:
+```
+go run main.go
+```
+5. visiting [metrics api](http://localhost:8080/v1/metrics) for Prometheus metrics observability(default config: disable). 
+
+### Running with your config
+
+Save [example config](https://github.com/vulcangz/gf2-authz/blob/main/manifest/config/config.example.yaml) as `config.yaml`. Edit it with your config.
+
+Then, same steps as above.
+
+
+that's all you need to get started!
+
 
 ## Credits
 
