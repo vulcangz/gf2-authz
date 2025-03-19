@@ -4,9 +4,12 @@ go 1.23.4
 
 replace github.com/vulcangz/gf2-authz => ../
 
+replace github.com/vulcangz/gf2-authz/pkg/sdk => ../pkg/sdk
+
 require (
 	github.com/gogf/gf/v2 v2.9.0
-	github.com/vulcangz/gf2-authz v0.0.0-00010101000000-000000000000
+	github.com/vulcangz/gf2-authz v0.0.0-20250319093340-d9a7e92962ce
+	github.com/vulcangz/gf2-authz/pkg/sdk v0.0.0-00010101000000-000000000000
 	google.golang.org/grpc v1.71.0
 )
 
@@ -22,8 +25,8 @@ require (
 	github.com/go-logr/logr v1.4.2 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/gogf/gf/contrib/registry/etcd/v2 v2.9.0 // indirect
-	github.com/gogf/gf/contrib/registry/file/v2 v2.8.3 // indirect
-	github.com/gogf/gf/contrib/rpc/grpcx/v2 v2.8.3 // indirect
+	github.com/gogf/gf/contrib/registry/file/v2 v2.9.0 // indirect
+	github.com/gogf/gf/contrib/rpc/grpcx/v2 v2.9.0 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/golang/protobuf v1.5.4 // indirect
 	github.com/google/uuid v1.6.0 // indirect

@@ -5,7 +5,6 @@ go 1.23.0
 toolchain go1.23.4
 
 require (
-	github.com/blang/semver v2.2.0+incompatible
 	github.com/coreos/go-oidc/v3 v3.13.0
 	github.com/cucumber/godog v0.15.0
 	github.com/glebarez/sqlite v1.11.0
@@ -16,7 +15,6 @@ require (
 	github.com/golang-jwt/jwt/v4 v4.5.1
 	github.com/golang/mock v1.6.0
 	github.com/google/uuid v1.6.0
-	github.com/grpc-ecosystem/go-grpc-middleware v1.4.0
 	github.com/grpc-ecosystem/go-grpc-middleware/v2 v2.3.1
 	github.com/prometheus/client_golang v1.21.1
 	github.com/spf13/pflag v1.0.6
