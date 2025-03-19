@@ -74,6 +74,7 @@ func Initialize(ctx context.Context, clock ctime.Clock) (db *gorm.DB, err error)
 		g.Log().Line().Infof(ctx, "%s database is alive!\n", dbConfig.Driver)
 	}
 
+	dbInstance = db
 	return dbInstance, nil
 }
 
@@ -100,7 +101,6 @@ func GetTestDatabase(ctx context.Context) *gorm.DB {
 	return dbInstance
 }
 
-// GetDatabase get database configuration options
 func GetDatabaseConfig(ctx context.Context) (conf *entity.DatabaseConfig, err error) {
 	val, err := g.Cfg().GetWithEnv(ctx, "database")
 	if err != nil {
