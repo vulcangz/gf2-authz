@@ -3,10 +3,10 @@ package resource
 import (
 	"context"
 	"errors"
-	"fmt"
 	"net/http"
 
 	"github.com/gogf/gf/v2/frame/g"
+	"github.com/gogf/gf/v2/net/ghttp"
 	v1 "github.com/vulcangz/gf2-authz/api/api/resource/v1"
 	"github.com/vulcangz/gf2-authz/internal/lib/orm"
 	"github.com/vulcangz/gf2-authz/internal/lib/response"
@@ -36,8 +36,7 @@ func (c *cResource) Create(ctx context.Context, req *v1.CreateReq) (res *v1.Crea
 	resource, err := service.ResourceManager().Create(ctx, req.ID, req.Kind, req.Value, req.AttributesMap())
 
 	if err != nil {
-		response.ReturnError(g.RequestFromCtx(ctx), http.StatusInternalServerError, err)
-
+		response.ReturnError(ghttp.RequestFromCtx(ctx), http.StatusInternalServerError, err, "")
 		return
 	}
 
@@ -65,7 +64,7 @@ func (c *cResource) List(ctx context.Context, req *v1.GetListReq) (res *v1.GetLi
 	r := g.RequestFromCtx(ctx)
 	page, size, err := orm.Paginate(r)
 	if err != nil {
-		response.ReturnError(r, http.StatusInternalServerError, err)
+		response.ReturnError(r, http.StatusInternalServerError, err, "")
 		return
 	}
 
@@ -78,7 +77,7 @@ func (c *cResource) List(ctx context.Context, req *v1.GetListReq) (res *v1.GetLi
 		orm.WithPreloads("Attributes"),
 	)
 	if err != nil {
-		response.ReturnError(r, http.StatusInternalServerError, err)
+		response.ReturnError(r, http.StatusInternalServerError, err, "")
 		return
 	}
 
@@ -114,9 +113,7 @@ func (c *cResource) Get(ctx context.Context, req *v1.GetOneReq) (res *v1.GetOneR
 			statusCode = http.StatusNotFound
 		}
 
-		response.ReturnError(r, statusCode,
-			fmt.Errorf("cannot retrieve resource: %v", err),
-		)
+		response.ReturnError(r, statusCode, err, "cannot retrieve resource")
 		return
 	}
 
@@ -143,9 +140,7 @@ func (c *cResource) Update(ctx context.Context, req *v1.UpdateReq) (res *v1.Upda
 	// Retrieve resource
 	resource, err := service.ResourceManager().Update(ctx, identifier, req.Kind, req.Value, req.AttributesMap())
 	if err != nil {
-		response.ReturnError(r, http.StatusInternalServerError,
-			fmt.Errorf("cannot update resource: %v", err),
-		)
+		response.ReturnError(r, http.StatusInternalServerError, err, "cannot update resource")
 		return
 	}
 
@@ -170,7 +165,7 @@ func (c *cResource) Delete(ctx context.Context, req *v1.DeleteReq) (res *v1.Dele
 	identifier := r.Get("identifier").String()
 
 	if err = service.ResourceManager().Delete(ctx, identifier); err != nil {
-		response.ReturnError(r, http.StatusInternalServerError, err)
+		response.ReturnError(r, http.StatusInternalServerError, err, "")
 		return
 	}
 

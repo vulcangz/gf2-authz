@@ -3,10 +3,10 @@ package policy
 import (
 	"context"
 	"errors"
-	"fmt"
 	"net/http"
 
 	"github.com/gogf/gf/v2/frame/g"
+	"github.com/gogf/gf/v2/net/ghttp"
 	v1 "github.com/vulcangz/gf2-authz/api/api/policy/v1"
 	"github.com/vulcangz/gf2-authz/internal/lib/orm"
 	"github.com/vulcangz/gf2-authz/internal/lib/response"
@@ -32,7 +32,6 @@ type cPolicy struct{}
 //	@Failure	500		{object}	model.ErrorResponse
 //	@Router		/v1/policies [Post]
 func (c *cPolicy) Create(ctx context.Context, req *v1.CreateReq) (res *v1.CreateRes, err error) {
-	r := g.RequestFromCtx(ctx)
 	// Create policy
 	policy, err := service.PolicyManager().Create(
 		ctx,
@@ -41,8 +40,9 @@ func (c *cPolicy) Create(ctx context.Context, req *v1.CreateReq) (res *v1.Create
 		req.Actions,
 		req.AttributeRules,
 	)
+	g.Dump("---cPolicy Create---", err)
 	if err != nil {
-		response.ReturnError(r, http.StatusInternalServerError, err)
+		response.ReturnError(ghttp.RequestFromCtx(ctx), http.StatusInternalServerError, err, "")
 		return
 	}
 
@@ -70,7 +70,7 @@ func (c *cPolicy) List(ctx context.Context, req *v1.GetListReq) (res *v1.GetList
 	r := g.RequestFromCtx(ctx)
 	page, size, err := orm.Paginate(r)
 	if err != nil {
-		response.ReturnError(r, http.StatusInternalServerError, err)
+		response.ReturnError(r, http.StatusInternalServerError, err, "")
 		return
 	}
 
@@ -84,7 +84,7 @@ func (c *cPolicy) List(ctx context.Context, req *v1.GetListReq) (res *v1.GetList
 	)
 
 	if err != nil {
-		response.ReturnError(r, http.StatusInternalServerError, err)
+		response.ReturnError(r, http.StatusInternalServerError, err, "")
 		return
 	}
 
@@ -120,10 +120,7 @@ func (c *cPolicy) Get(ctx context.Context, req *v1.GetOneReq) (res *v1.GetOneRes
 			statusCode = http.StatusNotFound
 		}
 
-		response.ReturnError(r, statusCode,
-			fmt.Errorf("cannot retrieve policy: %v", err),
-		)
-
+		response.ReturnError(r, statusCode, err, "cannot retrieve policy")
 		return
 	}
 
@@ -157,9 +154,7 @@ func (c *cPolicy) Update(ctx context.Context, req *v1.UpdateReq) (res *v1.Update
 		req.AttributeRules,
 	)
 	if err != nil {
-		response.ReturnError(r, http.StatusInternalServerError,
-			fmt.Errorf("cannot update policy: %v", err),
-		)
+		response.ReturnError(r, http.StatusInternalServerError, err, "cannot update policy")
 		return
 	}
 
@@ -184,7 +179,7 @@ func (c *cPolicy) Delete(ctx context.Context, req *v1.DeleteReq) (res *v1.Delete
 	identifier := r.Get("identifier").String()
 
 	if err = service.PolicyManager().Delete(ctx, identifier); err != nil {
-		response.ReturnError(r, http.StatusInternalServerError, err)
+		response.ReturnError(r, http.StatusInternalServerError, err, "")
 		return
 	}
 

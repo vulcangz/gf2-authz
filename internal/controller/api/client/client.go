@@ -3,10 +3,10 @@ package client
 import (
 	"context"
 	"errors"
-	"fmt"
 	"net/http"
 
 	"github.com/gogf/gf/v2/frame/g"
+	"github.com/gogf/gf/v2/net/ghttp"
 	v1 "github.com/vulcangz/gf2-authz/api/api/client/v1"
 	"github.com/vulcangz/gf2-authz/internal/lib/orm"
 	"github.com/vulcangz/gf2-authz/internal/lib/response"
@@ -16,7 +16,6 @@ import (
 
 var (
 	Client = cClient{}
-	// domain = g.Cfg().MustGet(context.Background(), "auth.domain").String()
 )
 
 type cClient struct{}
@@ -33,13 +32,11 @@ type cClient struct{}
 //	@Failure	500		{object}	model.ErrorResponse
 //	@Router		/v1/clients [Post]
 func (c *cClient) Create(ctx context.Context, req *v1.CreateReq) (res *v1.CreateRes, err error) {
-	r := g.RequestFromCtx(ctx)
-
 	authCfg, _ := service.SysConfig().GetAuth(ctx)
 	client, err := service.ClientManager().Create(ctx, req.Name, authCfg.Domain)
 
 	if err != nil {
-		response.ReturnError(r, http.StatusBadRequest, err)
+		response.ReturnError(ghttp.RequestFromCtx(ctx), http.StatusBadRequest, err, "")
 		return
 	}
 
@@ -67,7 +64,7 @@ func (c *cClient) List(ctx context.Context, req *v1.GetListReq) (res *v1.GetList
 	r := g.RequestFromCtx(ctx)
 	page, size, err := orm.Paginate(r)
 	if err != nil {
-		response.ReturnError(r, http.StatusInternalServerError, err)
+		response.ReturnError(r, http.StatusInternalServerError, err, "")
 		return
 	}
 
@@ -79,7 +76,7 @@ func (c *cClient) List(ctx context.Context, req *v1.GetListReq) (res *v1.GetList
 		orm.WithSort(orm.HttpSortToORM(r)),
 	)
 	if err != nil {
-		response.ReturnError(r, http.StatusInternalServerError, err)
+		response.ReturnError(r, http.StatusInternalServerError, err, "")
 		return
 	}
 
@@ -107,12 +104,11 @@ func (c *cClient) Get(ctx context.Context, req *v1.GetOneReq) (res *v1.GetOneRes
 	client, err := service.ClientManager().GetRepository().Get(identifier)
 	if err != nil {
 		statusCode := http.StatusInternalServerError
-
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			statusCode = http.StatusNotFound
 		}
 
-		response.ReturnError(r, statusCode, fmt.Errorf("cannot retrieve client: %v", err))
+		response.ReturnError(r, statusCode, err, "cannot retrieve client")
 		return
 	}
 
@@ -137,7 +133,7 @@ func (c *cClient) Delete(ctx context.Context, req *v1.DeleteReq) (res *v1.Delete
 	identifier := r.Get("identifier").String()
 
 	if err = service.ClientManager().Delete(ctx, identifier); err != nil {
-		response.ReturnError(r, http.StatusInternalServerError, err)
+		response.ReturnError(r, http.StatusInternalServerError, err, "")
 		return
 	}
 

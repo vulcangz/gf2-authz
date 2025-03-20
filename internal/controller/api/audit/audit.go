@@ -35,7 +35,7 @@ func (c *cAudit) AuditGet(ctx context.Context, req *v1.GetListReq) (res *v1.GetL
 	r := g.RequestFromCtx(ctx)
 	page, size, err := orm.Paginate(r)
 	if err != nil {
-		response.ReturnError(r, http.StatusInternalServerError, err)
+		response.ReturnError(r, http.StatusInternalServerError, err, "")
 		return
 	}
 
@@ -46,7 +46,7 @@ func (c *cAudit) AuditGet(ctx context.Context, req *v1.GetListReq) (res *v1.GetL
 		orm.WithSort(orm.HttpSortToORM(r)),
 	)
 	if err != nil {
-		response.ReturnError(r, http.StatusInternalServerError, err)
+		response.ReturnError(r, http.StatusInternalServerError, err, "")
 		return
 	}
 

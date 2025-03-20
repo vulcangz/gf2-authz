@@ -4,7 +4,7 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/gogf/gf/v2/frame/g"
+	"github.com/gogf/gf/v2/net/ghttp"
 	v1 "github.com/vulcangz/gf2-authz/api/api/stats/v1"
 	"github.com/vulcangz/gf2-authz/internal/lib/orm"
 	"github.com/vulcangz/gf2-authz/internal/lib/response"
@@ -32,7 +32,7 @@ func (c *cStats) Get(ctx context.Context, req *v1.GetStatReq) (res *v1.GetStatRe
 		orm.WithSort("date desc"),
 	)
 	if err != nil {
-		response.ReturnError(g.RequestFromCtx(ctx), http.StatusInternalServerError, err)
+		response.ReturnError(ghttp.RequestFromCtx(ctx), http.StatusInternalServerError, err, "")
 		return
 	}
 

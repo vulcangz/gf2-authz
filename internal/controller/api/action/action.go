@@ -3,7 +3,6 @@ package action
 import (
 	"context"
 	"errors"
-	"fmt"
 	"net/http"
 
 	"github.com/gogf/gf/v2/errors/gcode"
@@ -85,9 +84,7 @@ func (c *cAction) Get(ctx context.Context, req *v1.GetOneReq) (res *v1.GetOneRes
 			statusCode = http.StatusNotFound
 		}
 
-		err = fmt.Errorf("cannot retrieve action: %v", err)
-		response.ReturnError(r, statusCode, err)
-
+		response.ReturnError(r, statusCode, err, "cannot retrieve action")
 		return
 	}
 

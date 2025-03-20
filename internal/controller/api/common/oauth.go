@@ -36,12 +36,16 @@ const (
 func OAuthAuthenticate(r *ghttp.Request) {
 	state, err := tokenGenerator.Generate(16)
 	if err != nil {
-		response.ReturnError(r, http.StatusInternalServerError, fmt.Errorf("unable to generate state: %v", err))
+		err := errors.New("unable to generate state")
+		response.RExitError(r, http.StatusInternalServerError, err)
+		return
 	}
 
 	nonce, err := tokenGenerator.Generate(16)
 	if err != nil {
-		response.ReturnError(r, http.StatusInternalServerError, fmt.Errorf("unable to generate none: %v", err))
+		err := errors.New("unable to generate none")
+		response.RExitError(r, http.StatusInternalServerError, err)
+		return
 	}
 
 	setCallbackCookie(r, OAuthStateCookieName, state, oauthClientManager.GetCookiesDomainName())
@@ -68,45 +72,45 @@ func OAuthCallback(r *ghttp.Request) {
 	state := r.Cookie.Get(OAuthStateCookieName).String()
 
 	if r.Get("state").String() != state {
-		response.ReturnError(r, http.StatusBadRequest, errors.New("state did not match"))
+		response.RExitError(r, http.StatusBadRequest, errors.New("state did not match"))
 	}
 
 	oauth2Token, err := oauthClientManager.GetConfig().Exchange(ctx, r.Get("code").String())
 	if err != nil {
-		response.ReturnError(r, http.StatusInternalServerError, fmt.Errorf("failed to exchange token: %v", err))
+		response.RExitError(r, http.StatusInternalServerError, fmt.Errorf("failed to exchange token: %v", err))
 	}
 
 	rawIDToken, ok := oauth2Token.Extra("id_token").(string)
 	if !ok {
-		response.ReturnError(r, http.StatusInternalServerError, errors.New("no id_token field in oauth2 token"))
+		response.RExitError(r, http.StatusInternalServerError, errors.New("no id_token field in oauth2 token"))
 	}
 
 	idToken, err := oauthClientManager.GetVerifier().Verify(ctx, rawIDToken)
 	if err != nil {
-		response.ReturnError(r, http.StatusInternalServerError, fmt.Errorf("failed to verify id token: %v", err))
+		response.RExitError(r, http.StatusInternalServerError, fmt.Errorf("failed to verify id token: %v", err))
 	}
 
 	nonce := r.Cookie.Get(OAuthNonceCookieName).String()
 
 	if idToken.Nonce != nonce {
-		response.ReturnError(r, http.StatusBadRequest, fmt.Errorf("nonce did not match: %v", err))
+		response.RExitError(r, http.StatusBadRequest, fmt.Errorf("nonce did not match: %v", err))
 	}
 
 	// Obtain user claims from OpenID Connect ID token.
 	idTokenClaims := map[string]any{}
 
 	if err := idToken.Claims(&idTokenClaims); err != nil {
-		response.ReturnError(r, http.StatusInternalServerError, err)
+		response.RExitError(r, http.StatusInternalServerError, err)
 	}
 
 	emailValue, err := retrieveClaim(idTokenClaims, OAuthClaimEmailKey)
 	if err != nil {
-		response.ReturnError(r, http.StatusBadRequest, err)
+		response.RExitError(r, http.StatusBadRequest, err)
 	}
 
 	nameValue, err := retrieveClaim(idTokenClaims, OAuthClaimNameKey)
 	if err != nil {
-		response.ReturnError(r, http.StatusBadRequest, err)
+		response.RExitError(r, http.StatusBadRequest, err)
 	}
 
 	// Retrieve or create principal from user email.
@@ -122,16 +126,16 @@ func OAuthCallback(r *ghttp.Request) {
 				"name": nameValue,
 			},
 		); err != nil {
-			response.ReturnError(r, http.StatusInternalServerError, fmt.Errorf("unable to create principal: %v", err))
+			response.RExitError(r, http.StatusInternalServerError, fmt.Errorf("unable to create principal: %v", err))
 		}
 	} else if err != nil {
-		response.ReturnError(r, http.StatusInternalServerError, fmt.Errorf("unable to retrieve principal: %v", err))
+		response.RExitError(r, http.StatusInternalServerError, fmt.Errorf("unable to retrieve principal: %v", err))
 	}
 
 	// Generate access token.
 	jwtToken, err := jwtManager.Generate(emailValue)
 	if err != nil {
-		response.ReturnError(r, http.StatusInternalServerError, fmt.Errorf("unable to generate jwt token: %v", err))
+		response.RExitError(r, http.StatusInternalServerError, fmt.Errorf("unable to generate jwt token: %v", err))
 	}
 
 	setCallbackCookie(r, OAuthExpiresInCookieName, strconv.FormatInt(jwtToken.ExpiresIn, 10), oauthClientManager.GetCookiesDomainName())

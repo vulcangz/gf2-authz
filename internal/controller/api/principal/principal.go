@@ -3,10 +3,10 @@ package principal
 import (
 	"context"
 	"errors"
-	"fmt"
 	"net/http"
 
 	"github.com/gogf/gf/v2/frame/g"
+	"github.com/gogf/gf/v2/net/ghttp"
 	v1 "github.com/vulcangz/gf2-authz/api/api/principal/v1"
 	"github.com/vulcangz/gf2-authz/internal/lib/orm"
 	"github.com/vulcangz/gf2-authz/internal/lib/response"
@@ -35,7 +35,7 @@ func (c *cPrincipal) Create(ctx context.Context, req *v1.CreateReq) (res *v1.Cre
 	// Create principal
 	principal, err := service.PrincipalManager().Create(ctx, req.ID, req.Roles, req.AttributesMap())
 	if err != nil {
-		response.ReturnError(g.RequestFromCtx(ctx), http.StatusInternalServerError, err)
+		response.ReturnError(ghttp.RequestFromCtx(ctx), http.StatusInternalServerError, err, "")
 		return
 	}
 
@@ -63,7 +63,7 @@ func (c *cPrincipal) List(ctx context.Context, req *v1.GetListReq) (res *v1.GetL
 	r := g.RequestFromCtx(ctx)
 	page, size, err := orm.Paginate(r)
 	if err != nil {
-		response.ReturnError(r, http.StatusInternalServerError, err)
+		response.ReturnError(r, http.StatusInternalServerError, err, "")
 		return
 	}
 
@@ -76,7 +76,7 @@ func (c *cPrincipal) List(ctx context.Context, req *v1.GetListReq) (res *v1.GetL
 		orm.WithPreloads("Attributes", "Roles"),
 	)
 	if err != nil {
-		response.ReturnError(r, http.StatusInternalServerError, err)
+		response.ReturnError(r, http.StatusInternalServerError, err, "")
 		return
 	}
 
@@ -107,14 +107,11 @@ func (c *cPrincipal) Get(ctx context.Context, req *v1.GetOneReq) (res *v1.GetOne
 	)
 	if err != nil {
 		statusCode := http.StatusInternalServerError
-
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			statusCode = http.StatusNotFound
 		}
 
-		response.ReturnError(r, statusCode,
-			fmt.Errorf("cannot retrieve principal: %v", err),
-		)
+		response.ReturnError(r, statusCode, err, "cannot retrieve principal")
 		return
 	}
 
@@ -142,9 +139,7 @@ func (c *cPrincipal) Update(ctx context.Context, req *v1.UpdateReq) (res *v1.Upd
 	// Retrieve principal
 	principal, err := service.PrincipalManager().Update(ctx, identifier, req.Roles, req.AttributesMap())
 	if err != nil {
-		response.ReturnError(r, http.StatusInternalServerError,
-			fmt.Errorf("cannot update principal: %v", err),
-		)
+		response.ReturnError(r, http.StatusInternalServerError, err, "cannot update principal")
 		return
 	}
 
@@ -170,7 +165,7 @@ func (c *cPrincipal) Delete(ctx context.Context, req *v1.DeleteReq) (res *v1.Del
 
 	err = service.PrincipalManager().Delete(ctx, identifier)
 	if err != nil {
-		response.ReturnError(r, http.StatusInternalServerError, err)
+		response.ReturnError(r, http.StatusInternalServerError, err, "")
 		return
 	}
 

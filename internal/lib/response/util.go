@@ -2,6 +2,7 @@ package response
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"github.com/gogf/gf/v2/net/ghttp"
@@ -9,23 +10,30 @@ import (
 	"github.com/gogf/gf/v2/os/gtime"
 )
 
-func ReturnError(r *ghttp.Request, statusCode int, err error) error {
-	RJson(r, statusCode, err.Error())
-	r.Exit()
-
-	return nil
-}
-
-func ReturnError1(r *ghttp.Request, statusCode int, err error) error {
+func ReturnError(r *ghttp.Request, statusCode int, err error, message string) error {
 	r.Response.WriteStatus(statusCode)
+
+	text := ""
+	if message == "" || message == err.Error() {
+		text = err.Error()
+	} else {
+		text = fmt.Sprintf("%s: %v", message, err)
+	}
 
 	r.Response.WriteJson(Response{
 		Code:      statusCode,
 		Error:     true,
-		Message:   err.Error(),
+		Message:   text,
 		Timestamp: gtime.Timestamp(),
 		TraceID:   gctx.CtxId(r.Context()),
 	})
+
+	return nil
+}
+
+func RExitError(r *ghttp.Request, statusCode int, err error) error {
+	RJson(r, statusCode, err.Error())
+	r.Exit()
 
 	return nil
 }

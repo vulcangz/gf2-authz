@@ -139,12 +139,12 @@ func (c *cUser) Delete(ctx context.Context, req *v1.DeleteReq) (res *v1.DeleteRe
 
 	userID := ctx.Value(consts.UserIdentifierKey).(string)
 	if userID == identifier {
-		response.ReturnError(r, http.StatusBadRequest, ErrCannotDeleteOwnAccount)
+		response.ReturnError(r, http.StatusBadRequest, ErrCannotDeleteOwnAccount, "")
 		return
 	}
 
 	if err = service.UserManager().Delete(ctx, identifier); err != nil {
-		response.ReturnError(r, http.StatusInternalServerError, err)
+		response.ReturnError(r, http.StatusInternalServerError, err, "")
 		return
 	}
 

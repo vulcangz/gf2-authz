@@ -8,6 +8,7 @@ import (
 	"github.com/gogf/gf/v2/errors/gcode"
 	"github.com/gogf/gf/v2/errors/gerror"
 	"github.com/gogf/gf/v2/frame/g"
+	"github.com/gogf/gf/v2/net/ghttp"
 	"github.com/gogf/gf/v2/util/gconv"
 	v1 "github.com/vulcangz/gf2-authz/api/api/common/v1"
 	"github.com/vulcangz/gf2-authz/internal/lib/orm"
@@ -39,13 +40,12 @@ type cAuth struct {
 //	@Failure	500		{object}	model.ErrorResponse
 //	@Router		/v1/auth [Post]
 func (c *cAuth) Authenticate(ctx context.Context, req *v1.AuthReq) (res *v1.AuthRes, err error) {
-	r := g.RequestFromCtx(ctx)
-
+	r := ghttp.RequestFromCtx(ctx)
 	user, err := service.UserManager().GetRepository().GetByFields(map[string]orm.FieldValue{
 		"username": {Operator: "=", Value: req.Username},
 	})
 	if err != nil {
-		response.ReturnError(r, http.StatusBadRequest, err)
+		response.ReturnError(r, http.StatusBadRequest, err, "")
 		return
 	}
 
@@ -53,13 +53,13 @@ func (c *cAuth) Authenticate(ctx context.Context, req *v1.AuthReq) (res *v1.Auth
 		[]byte(user.PasswordHash),
 		[]byte(req.Password),
 	); err != nil {
-		response.ReturnError(r, http.StatusBadRequest, errors.New("invalid credentials"))
+		response.ReturnError(r, http.StatusBadRequest, err, "invalid credentials")
 		return
 	}
 
 	token, err := jwtManager.Generate(user.Username)
 	if err != nil {
-		response.ReturnError(r, http.StatusBadRequest, errors.New("unable to generate token"))
+		response.ReturnError(r, http.StatusBadRequest, err, "unable to generate token")
 		return
 	}
 
