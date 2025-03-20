@@ -11,6 +11,7 @@ import (
 	"github.com/gogf/gf/v2/net/ghttp"
 	"github.com/gogf/gf/v2/os/gctx"
 	"github.com/gogf/gf/v2/text/gstr"
+	"github.com/gogf/gf/v2/util/gmode"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/collectors"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
@@ -27,7 +28,7 @@ import (
 	"github.com/vulcangz/gf2-authz/internal/controller/api/role"
 	"github.com/vulcangz/gf2-authz/internal/controller/api/stats"
 	"github.com/vulcangz/gf2-authz/internal/controller/api/user"
-	"github.com/vulcangz/gf2-authz/internal/lib/database"
+	"github.com/vulcangz/gf2-authz/internal/lib/compile"
 	"github.com/vulcangz/gf2-authz/internal/lib/jwt"
 	"github.com/vulcangz/gf2-authz/internal/service"
 )
@@ -36,6 +37,7 @@ func testServer() {
 	ctx := gctx.New()
 
 	s := g.Server()
+	gmode.SetTesting()
 
 	s.Use(service.Middleware().MiddlewareCORS,
 		ghttp.MiddlewareHandlerResponse)
@@ -83,7 +85,7 @@ func testServer() {
 					"GET: /":               client.Client.List,
 					"POST: /":              client.Client.Create,
 					"GET: /:identifier":    client.Client.Get,
-					"Delete: /:identifier": client.Client.Delete,
+					"DELETE: /:identifier": client.Client.Delete,
 				})
 			})
 
@@ -100,8 +102,8 @@ func testServer() {
 					"GET: /":               policy.Policy.List,
 					"POST: /":              policy.Policy.Create,
 					"GET: /:identifier":    policy.Policy.Get,
-					"Delete: /:identifier": policy.Policy.Delete,
-					"Put: /:identifier":    policy.Policy.Update,
+					"DELETE: /:identifier": policy.Policy.Delete,
+					"PUT: /:identifier":    policy.Policy.Update,
 				})
 			})
 
@@ -111,8 +113,8 @@ func testServer() {
 					"GET: /":               principal.Principal.List,
 					"POST: /":              principal.Principal.Create,
 					"GET: /:identifier":    principal.Principal.Get,
-					"Delete: /:identifier": principal.Principal.Delete,
-					"Put: /:identifier":    principal.Principal.Update,
+					"DELETE: /:identifier": principal.Principal.Delete,
+					"PUT: /:identifier":    principal.Principal.Update,
 				})
 			})
 
@@ -122,8 +124,8 @@ func testServer() {
 					"GET: /":               resource.Resource.List,
 					"POST: /":              resource.Resource.Create,
 					"GET: /:identifier":    resource.Resource.Get,
-					"Delete: /:identifier": resource.Resource.Delete,
-					"Put: /:identifier":    resource.Resource.Update,
+					"DELETE: /:identifier": resource.Resource.Delete,
+					"PUT: /:identifier":    resource.Resource.Update,
 				})
 			})
 
@@ -133,8 +135,8 @@ func testServer() {
 					"GET: /":               role.Role.List,
 					"POST: /":              role.Role.Create,
 					"GET: /:identifier":    role.Role.Get,
-					"Delete: /:identifier": role.Role.Delete,
-					"Put: /:identifier":    role.Role.Update,
+					"DELETE: /:identifier": role.Role.Delete,
+					"PUT: /:identifier":    role.Role.Update,
 				})
 			})
 
@@ -151,7 +153,7 @@ func testServer() {
 					"GET: /":               user.User.List,
 					"POST: /":              user.User.Create,
 					"GET: /:identifier":    user.User.Get,
-					"Delete: /:identifier": user.User.Delete,
+					"DELETE: /:identifier": user.User.Delete,
 				})
 			})
 
@@ -168,11 +170,14 @@ func testServer() {
 
 func initComponents(ctx context.Context) {
 	// database connection initialize
-	database.GetDatabase(ctx)
+	// database.GetDatabase(ctx)
 
 	jwt.Init(ctx)
 
 	common.Initializer(ctx)
+
+	sub := compile.SubscriberInit(ctx)
+	sub.Start(ctx)
 }
 
 func hookForAuthorization(r *ghttp.Request) {

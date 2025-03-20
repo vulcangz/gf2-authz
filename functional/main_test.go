@@ -16,7 +16,6 @@ import (
 
 	"github.com/vulcangz/gf2-authz/internal/lib/database"
 	_ "github.com/vulcangz/gf2-authz/internal/logic"
-	"github.com/vulcangz/gf2-authz/internal/model/entity"
 	"github.com/vulcangz/gf2-authz/internal/service"
 
 	"github.com/vulcangz/gf2-authz/internal/fixtures"
@@ -82,31 +81,27 @@ func InitializeScenario(ctx *godog.ScenarioContext) {
 
 	//mysql
 	ctx.Before(func(ctx context.Context, sc *godog.Scenario) (context.Context, error) {
-		cfg, _ := service.SysConfig().GetDatabase(ctx)
-
+		cfg, _ := service.SysConfig().GetDatabase(context.Background())
 		switch cfg.Driver {
-		case entity.DriverSqlite:
-			if err := db.Exec(`TRUNCATE TABLE
-			authz_compiled_policies,
-			authz_roles_policies,
-			authz_roles,
-			authz_principals_roles,
-			authz_principals,
-			authz_policies_actions,
-			authz_policies_resources,
-			authz_policies,
-			authz_resources,
-			authz_clients,
-			authz_users,
-			authz_oauth_tokens,
-			authz_stats,
-			authz_actions RESTART IDENTITY CASCADE
-			;`).Error; err != nil {
-				l.Fatalf("Unable to truncate tables: %v\n", err)
+		case "sqlite": //entity.DriverSqlite:
+			var truncateSQLSlice []string
+			db.Raw("SELECT CONCAT(\"DELETE FROM `\", NAME, '`;') FROM sqlite_master WHERE type='table' AND name like 'authz_%'").Scan(&truncateSQLSlice)
+			truncateSQLSlice = append(truncateSQLSlice, "SET FOREIGN_KEY_CHECKS = 1;")
+
+			if err := db.Exec(`
+			SET FOREIGN_KEY_CHECKS = 0;
+			`).Error; err != nil {
+				logger.Error("Unable to set foreign key checks: ", slog.Any("err", err))
 			}
 
-		case entity.DriverMysql:
-		default:
+			for _, v := range truncateSQLSlice {
+				if err := db.Exec(v).Error; err != nil {
+					logger.Error("Unable to truncate table: ", slog.Any("sql", v), slog.Any("err", err))
+					return ctx, err
+				}
+			}
+
+		case "postgres": //entity.DriverPostgres:
 			var truncateSQLSlice []string
 			db.Raw("SELECT CONCAT(\"TRUNCATE TABLE `\", t.TABLE_NAME, '`;') FROM information_schema.`TABLES` t WHERE t.TABLE_SCHEMA =?", cfg.Dbname).Scan(&truncateSQLSlice)
 			truncateSQLSlice = append(truncateSQLSlice, "SET FOREIGN_KEY_CHECKS = 1;")
@@ -119,7 +114,25 @@ func InitializeScenario(ctx *godog.ScenarioContext) {
 
 			for _, v := range truncateSQLSlice {
 				if err := db.Exec(v).Error; err != nil {
-					logger.Error("Unable to truncate tables: ", slog.Any("err", err))
+					logger.Error("Unable to truncate table: ", slog.Any("sql", v), slog.Any("err", err))
+					return ctx, err
+				}
+			}
+
+		case "mysql": //entity.DriverMysql:
+			var truncateSQLSlice []string
+			db.Raw("SELECT CONCAT(\"TRUNCATE `\", t.TABLE_NAME, '`;') FROM information_schema.`TABLES` t WHERE t.TABLE_SCHEMA =?", cfg.Dbname).Scan(&truncateSQLSlice)
+			truncateSQLSlice = append(truncateSQLSlice, "SET FOREIGN_KEY_CHECKS = 1;")
+
+			if err := db.Exec(`
+			SET FOREIGN_KEY_CHECKS = 0;
+			`).Error; err != nil {
+				logger.Error("Unable to set foreign key checks: ", slog.Any("err", err))
+			}
+
+			for _, v := range truncateSQLSlice {
+				if err := db.Exec(v).Error; err != nil {
+					logger.Error("Unable to truncate table: ", slog.Any("sql", v), slog.Any("err", err))
 					return ctx, err
 				}
 			}
