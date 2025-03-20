@@ -90,7 +90,7 @@ var (
 							"GET: /":               client.Client.List,
 							"POST: /":              client.Client.Create,
 							"GET: /:identifier":    client.Client.Get,
-							"Delete: /:identifier": client.Client.Delete,
+							"DELETE: /:identifier": client.Client.Delete,
 						})
 					})
 
@@ -107,8 +107,8 @@ var (
 							"GET: /":               policy.Policy.List,
 							"POST: /":              policy.Policy.Create,
 							"GET: /:identifier":    policy.Policy.Get,
-							"Delete: /:identifier": policy.Policy.Delete,
-							"Put: /:identifier":    policy.Policy.Update,
+							"DELETE: /:identifier": policy.Policy.Delete,
+							"PUT: /:identifier":    policy.Policy.Update,
 						})
 					})
 
@@ -118,8 +118,8 @@ var (
 							"GET: /":               principal.Principal.List,
 							"POST: /":              principal.Principal.Create,
 							"GET: /:identifier":    principal.Principal.Get,
-							"Delete: /:identifier": principal.Principal.Delete,
-							"Put: /:identifier":    principal.Principal.Update,
+							"DELETE: /:identifier": principal.Principal.Delete,
+							"PUT: /:identifier":    principal.Principal.Update,
 						})
 					})
 
@@ -129,8 +129,8 @@ var (
 							"GET: /":               resource.Resource.List,
 							"POST: /":              resource.Resource.Create,
 							"GET: /:identifier":    resource.Resource.Get,
-							"Delete: /:identifier": resource.Resource.Delete,
-							"Put: /:identifier":    resource.Resource.Update,
+							"DELETE: /:identifier": resource.Resource.Delete,
+							"PUT: /:identifier":    resource.Resource.Update,
 						})
 					})
 
@@ -140,8 +140,8 @@ var (
 							"GET: /":               role.Role.List,
 							"POST: /":              role.Role.Create,
 							"GET: /:identifier":    role.Role.Get,
-							"Delete: /:identifier": role.Role.Delete,
-							"Put: /:identifier":    role.Role.Update,
+							"DELETE: /:identifier": role.Role.Delete,
+							"PUT: /:identifier":    role.Role.Update,
 						})
 					})
 
@@ -158,7 +158,7 @@ var (
 							"GET: /":               user.User.List,
 							"POST: /":              user.User.Create,
 							"GET: /:identifier":    user.User.Get,
-							"Delete: /:identifier": user.User.Delete,
+							"DELETE: /:identifier": user.User.Delete,
 						})
 					})
 

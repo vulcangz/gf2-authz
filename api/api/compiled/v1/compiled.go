@@ -8,8 +8,7 @@ import (
 )
 
 type GetListReq struct {
-	g.Meta     `path:"/{identifier}/matches" method:"get" tags:"Policy" summary:"Retrieve compiled policies"`
-	Identifier string `json:"identifier" in:"path" dc:"policy id"`
+	g.Meta `path:"" method:"get" tags:"Policy" summary:"Retrieve compiled policies"`
 }
 
 type GetListRes struct {

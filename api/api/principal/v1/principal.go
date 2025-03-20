@@ -51,7 +51,7 @@ type GetListRes struct {
 }
 
 type DeleteReq struct {
-	g.Meta     `path:"/principals/{identifier}" method:"delete" tags:"ActionService" summary:"Delete a single principal"`
+	g.Meta     `path:"/{identifier}" method:"delete" tags:"ActionService" summary:"Delete a single principal"`
 	Identifier string `json:"identifier" in:"path" dc:"principal id"`
 }
 

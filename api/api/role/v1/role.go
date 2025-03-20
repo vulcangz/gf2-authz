@@ -19,7 +19,7 @@ type CreateRes struct {
 }
 
 type UpdateReq struct {
-	g.Meta   `path:"/{identifier}" method:"Put" tags:"Role" summary:"Updates a role"`
+	g.Meta   `path:"/{identifier}" method:"put" tags:"Role" summary:"Updates a role"`
 	Policies []string `json:"policies" v:"required"`
 }
 
