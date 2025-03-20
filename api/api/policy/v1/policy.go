@@ -31,7 +31,6 @@ type CreateReq struct {
 type CreateRes struct {
 	g.Meta `mime:"application/json"`
 	*entity.Policy
-	// Policy *entity.Policy `json:"policy"`
 }
 
 type UpdateReq struct {
@@ -44,7 +43,6 @@ type UpdateReq struct {
 type UpdateRes struct {
 	g.Meta `mime:"application/json"`
 	*entity.Policy
-	// Policy *entity.Policy `json:"policy"`
 }
 
 type GetOneReq struct {
@@ -55,7 +53,6 @@ type GetOneReq struct {
 type GetOneRes struct {
 	g.Meta `mime:"application/json"`
 	*entity.Policy
-	// Policy *entity.Policy `json:"policy"`
 }
 
 type GetListReq struct {
@@ -65,7 +62,6 @@ type GetListReq struct {
 type GetListRes struct {
 	g.Meta `mime:"application/json"`
 	*orm.Paginated[entity.Policy]
-	// List   *orm.Paginated[entity.Policy] `json:"list"`
 }
 
 type DeleteReq struct {

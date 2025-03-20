@@ -78,9 +78,6 @@ func (s *subscriber) Start(ctx context.Context) {
 
 	if s.metricEnabled {
 		roleEventChan := s.dispatcher.Subscribe(event.EventTypeRole)
-		// go s.handleItemEvents(policyEventChan, "policy")
-		// go s.handleItemEvents(principalEventChan, "principal")
-		// go s.handleItemEvents(resourceEventChan, "resource")
 		go s.handleItemEvents(roleEventChan, "role")
 	}
 

@@ -15,7 +15,6 @@ type CreateReq struct {
 type CreateRes struct {
 	g.Meta `mime:"application/json"`
 	*entity.Client
-	// Client *entity.Client `json:"client"`
 }
 
 type GetOneReq struct {
