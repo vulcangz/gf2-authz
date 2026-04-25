@@ -87,6 +87,48 @@ Then, same steps as above.
 that's all you need to get started!
 
 
+## TEST
+
+It has not yet been 100% passed. 
+
+The following tests use a MySQL database.
+
+1. Save [example config](https://github.com/vulcangz/gf2-authz/blob/main/manifest/config/config.example.yaml) as `config.yaml`. Edit it with your config.
+2. Create DB you defined in the config.yaml.
+3. Run the test:
+```
+$ export GF_GMODE=testing
+
+$ go test -count=1 --tags=functional -v ./functional
+or just test feature "action", other features: check, compiled, policy, principal, resource, role, user
+$ go test -count=1 --tags=functional -v ./functional -t @action
+```
+The test results are similar to the following:
+```
+2026-04-25T13:09:04.026Z [INFO] database.go:74: mysql database is alive!
+
+2026-04-25T13:09:04.032Z [INFO] initialize start...
+2026-04-25T13:09:04.035Z [INFO] initializeResources start……
+2026-04-25T13:09:04.108Z [INFO] initializeResources ok.
+2026-04-25T13:09:04.219Z [INFO] initializePolicies ok.
+2026-04-25T13:09:04.247Z [INFO] initializeRoles ok.
+2026-04-25T13:09:04.267Z [INFO] initializeUser start update……
+2026-04-25T13:09:04.276Z [INFO] initialize end.
+2026-04-25T13:09:04.276Z [INFO] {c90e1bc7899ba918939199752b024807} Compiler: subscribed to event dispatchers
+2026-04-25T13:09:04.302Z [INFO] pid[15662]: http server started listening on [:8080]
+2026-04-25T13:09:04.302Z [INFO] swagger ui is serving at address: http://127.0.0.1:8080/swagger/
+2026-04-25T13:09:04.306Z [INFO] openapi specification is serving at address: http://127.0.0.1:8080/api.json
+Feature: action
+  Test action-related APIs
+time=2026-04-25T13:09:04.380Z level=INFO msg=马上进入到step……
+...
+29 scenarios (6 passed, 23 failed)
+256 steps (190 passed, 23 failed, 43 skipped)
+22.585910196s
+FAIL    github.com/vulcangz/gf2-authz/functional        23.378s
+FAIL
+```
+
 ## Credits
 
 - [eko/authz](https://github.com/eko/authz)

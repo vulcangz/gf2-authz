@@ -22,7 +22,6 @@ import (
 
 	"github.com/cucumber/godog"
 	"github.com/cucumber/godog/colors"
-	"github.com/gogf/gf/v2/frame/g"
 	"github.com/spf13/pflag"
 	"gorm.io/gorm"
 )
@@ -45,7 +44,7 @@ var (
 
 func init() {
 	godog.BindCommandLineFlags("godog.", &opts)
-	appName = g.Cfg().MustGet(context.Background(), "app.name").String()
+	appName = "authz" // g.Cfg().MustGet(context.Background(), "app.name").String()
 
 	db = database.GetDatabase(context.Background())
 	logger = slog.New(slog.NewTextHandler(os.Stderr, nil))
@@ -86,10 +85,10 @@ func InitializeScenario(ctx *godog.ScenarioContext) {
 		case "sqlite": //entity.DriverSqlite:
 			var truncateSQLSlice []string
 			db.Raw("SELECT CONCAT(\"DELETE FROM `\", NAME, '`;') FROM sqlite_master WHERE type='table' AND name like 'authz_%'").Scan(&truncateSQLSlice)
-			truncateSQLSlice = append(truncateSQLSlice, "SET FOREIGN_KEY_CHECKS = 1;")
+			truncateSQLSlice = append(truncateSQLSlice, "PRAGMA foreign_keys = ON;")
 
 			if err := db.Exec(`
-			SET FOREIGN_KEY_CHECKS = 0;
+			PRAGMA foreign_keys = OFF;
 			`).Error; err != nil {
 				logger.Error("Unable to set foreign key checks: ", slog.Any("err", err))
 			}
