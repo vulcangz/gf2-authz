@@ -30,7 +30,6 @@ type cCompiled struct{}
 func (c *cCompiled) List(ctx context.Context, req *v1.GetListReq) (res *v1.GetListRes, err error) {
 	r := g.RequestFromCtx(ctx)
 	page, size, err := orm.Paginate(r)
-	g.Dump("---cCompiled List---", page, size, err)
 	if err != nil {
 		response.ReturnError(r, http.StatusInternalServerError, err, "")
 		return

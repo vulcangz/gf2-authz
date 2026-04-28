@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/util/gmode"
 	"github.com/vulcangz/gf2-authz/internal/event"
 	"github.com/vulcangz/gf2-authz/internal/lib/ctime"
@@ -91,19 +90,13 @@ func (m *sResourceManager) Create(ctx context.Context, identifier string, kind s
 		return nil, fmt.Errorf("unable to convert attributes to slice: %v", err)
 	}
 
-	g.Dump("===Resource Create: attributes===", attributes)
-	// var attributeObjects entity.Attributes
-	// if err := gconv.Structs(attributes, &attributeObjects); err != nil {
-	// 	panic(err)
-	// }
-
 	resource := &entity.Resource{
 		ID:         identifier,
 		Kind:       kind,
 		Value:      value,
 		Attributes: attributeObjects,
 	}
-	g.Dump("===Resource Create: attributeObjects===", attributeObjects)
+
 	if err := m.repository.Create(resource); err != nil {
 		return nil, fmt.Errorf("unable to create resource: %v", err)
 	}

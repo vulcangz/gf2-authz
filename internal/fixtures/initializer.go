@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"log/slog"
+	"strings"
 
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/vulcangz/gf2-authz/internal/lib/database"
@@ -70,19 +70,35 @@ func (i *initializer) Initialize() error {
 	}
 
 	if err := i.initializeResources(); err != nil {
-		return err
+		if !strings.Contains(err.Error(), "a resource already exists with id") {
+			return err
+		}
+
+		g.Log().Debug(ctx, err.Error())
 	}
 
 	if err := i.initializePolicies(); err != nil {
-		return err
+		if !strings.Contains(err.Error(), "a policy already exists with identifier") {
+			return err
+		}
+
+		g.Log().Debug(ctx, err.Error())
 	}
 
 	if err := i.initializeRoles(); err != nil {
-		return err
+		if !strings.Contains(err.Error(), "a role already exists with identifier") {
+			return err
+		}
+
+		g.Log().Debug(ctx, err.Error())
 	}
 
 	if err := i.initializeUser(); err != nil {
-		return err
+		if !strings.Contains(err.Error(), "Duplicate entry 'authz-user-admin'") {
+			return err
+		}
+
+		g.Log().Debug(ctx, err.Error())
 	}
 
 	g.Log().Info(ctx, "initialize end.")
@@ -170,7 +186,7 @@ func (i *initializer) initializeUser() error {
 		"username": {Operator: "=", Value: defaultAdminUsername},
 	})
 	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
-		g.Log().Error(ctx, "Unable to get default admin user", slog.Any("err", err))
+		g.Log().Debugf(ctx, "Unable to get default admin user: %v", err)
 		return err
 	}
 
@@ -182,7 +198,8 @@ func (i *initializer) initializeUser() error {
 	// Create user "admin" and principal named "authz-user-admin"
 	user, err := service.UserManager().Create(ctx, defaultAdminUsername, defaultAdminPassword)
 	if err != nil {
-		return fmt.Errorf("unable to create default admin user: %v", err)
+		g.Log().Debugf(ctx, "unable to create default admin user: %v", err)
+		return err
 	}
 
 	// Retrieve principal created following the user creation
@@ -190,7 +207,8 @@ func (i *initializer) initializeUser() error {
 		entity.UserPrincipal(user.Username),
 	)
 	if err != nil {
-		return fmt.Errorf("unable to retrieve admin principal: %v", err)
+		g.Log().Debugf(ctx, "unable to retrieve admin principal: %v", err)
+		return err
 	}
 
 	principal.IsLocked = true
@@ -198,7 +216,8 @@ func (i *initializer) initializeUser() error {
 	// Attach role "authz-admin" to user principal "authz-admin"
 	role, err := service.RoleManager().GetRepository().Get(fmt.Sprintf("%s-admin", appName))
 	if err != nil {
-		return fmt.Errorf("unable to retrieve admin role: %v", err)
+		g.Log().Debugf(ctx, "unable to retrieve admin role: %v", err)
+		return err
 	}
 
 	principal.Roles = []*entity.Role{role}

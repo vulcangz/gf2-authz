@@ -40,7 +40,7 @@ func (c *cPolicy) Create(ctx context.Context, req *v1.CreateReq) (res *v1.Create
 		req.Actions,
 		req.AttributeRules,
 	)
-	g.Dump("---cPolicy Create---", err)
+
 	if err != nil {
 		response.ReturnError(ghttp.RequestFromCtx(ctx), http.StatusInternalServerError, err, "")
 		return

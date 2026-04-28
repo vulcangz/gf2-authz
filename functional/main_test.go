@@ -140,7 +140,7 @@ func InitializeScenario(ctx *godog.ScenarioContext) {
 			db.Exec("TRUNCATE TABLE `authz_users`")
 			db.Exec("SET SESSION FOREIGN_KEY_CHECKS = 1")
 		}
-		logger.Info("Already TRUNCATE all tables.")
+
 		if err := api.reset(sc); err != nil {
 			logger.Error("Cannot reset api: ", slog.Any("err", err))
 			return ctx, err
@@ -167,7 +167,7 @@ func InitializeScenario(ctx *godog.ScenarioContext) {
 		time.Sleep(duration)
 		return nil
 	})
-	logger.Info("马上进入到step……")
+
 	ctx.Step(`^I authenticate with username "([^"]*)" and password "([^"]*)"$`, api.iAuthenticateWithUsernameAndPassword)
 	ctx.Step(`^I send "(GET|POST|PUT|DELETE)" request to "([^"]*)"$`, api.iSendRequestTo)
 	ctx.Step(`^I send "(GET|POST|PUT|DELETE)" request to "([^"]*)" with payload:$`, api.iSendRequestToWithPayload)
