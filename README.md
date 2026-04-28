@@ -87,9 +87,9 @@ Then, same steps as above.
 that's all you need to get started!
 
 
-## TEST
+## Testing
 
-It has not yet been 100% passed. 
+When all features are tested together, the pass rate is close to 91%. However, individual features should pass their tests. 
 
 The following tests use a MySQL database.
 
@@ -120,12 +120,12 @@ The test results are similar to the following:
 2026-04-25T13:09:04.306Z [INFO] openapi specification is serving at address: http://127.0.0.1:8080/api.json
 Feature: action
   Test action-related APIs
-time=2026-04-25T13:09:04.380Z level=INFO msg=马上进入到step……
+2026-04-28T11:50:01.189Z [INFO] initialize start...
 ...
-29 scenarios (6 passed, 23 failed)
-256 steps (190 passed, 23 failed, 43 skipped)
-22.585910196s
-FAIL    github.com/vulcangz/gf2-authz/functional        23.378s
+29 scenarios (27 passed, 2 failed)
+256 steps (234 passed, 2 failed, 20 skipped)
+34.388410065s
+FAIL    github.com/vulcangz/gf2-authz/functional        35.027s
 FAIL
 ```
 
