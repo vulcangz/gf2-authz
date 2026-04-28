@@ -26,8 +26,8 @@ Feature: policy
         "actions": [
           {
             "id": "create",
-            "created_at": "2100-01-01T09:00:00+08:00",
-            "updated_at": "2100-01-01T09:00:00+08:00"
+            "created_at": "2100-01-01T01:00:00Z",
+            "updated_at": "2100-01-01T01:00:00Z"
           }
         ],
         "attribute_rules": null,
@@ -37,8 +37,8 @@ Feature: policy
             "id": "post.123",
             "is_locked": false,
             "kind": "post",
-            "created_at": "2100-01-01T09:00:00+08:00",
-            "updated_at": "2100-01-01T09:00:00+08:00",
+            "created_at": "2100-01-01T01:00:00Z",
+            "updated_at": "2100-01-01T01:00:00Z",
             "value": "123"
           }
         ],
@@ -108,8 +108,8 @@ Feature: policy
         "actions": [
           {
             "id": "update",
-            "created_at": "2100-01-01T09:00:00+08:00",
-            "updated_at": "2100-01-01T09:00:00+08:00"
+            "created_at": "2100-01-01T01:00:00Z",
+            "updated_at": "2100-01-01T01:00:00Z"
           }
         ],
         "attribute_rules": null,
@@ -119,12 +119,12 @@ Feature: policy
             "id": "post.456",
             "is_locked": false,
             "kind": "post",
-            "created_at": "2100-01-01T09:00:00+08:00",
-            "updated_at": "2100-01-01T09:00:00+08:00",
+            "created_at": "2100-01-01T01:00:00Z",
+            "updated_at": "2100-01-01T01:00:00Z",
             "value": "456"
           }
         ],
-        "created_at": "2100-01-01T09:00:00+08:00",
+        "created_at": "2100-01-01T01:00:00Z",
         "updated_at": "2100-01-01T01:00:00Z"
       }
       """
@@ -155,8 +155,8 @@ Feature: policy
         "actions": [
           {
             "id": "create",
-            "created_at": "2100-01-01T09:00:00+08:00",
-            "updated_at": "2100-01-01T09:00:00+08:00"
+            "created_at": "2100-01-01T01:00:00Z",
+            "updated_at": "2100-01-01T01:00:00Z"
           }
         ],
         "attribute_rules": null,
@@ -166,13 +166,13 @@ Feature: policy
             "id": "post.123",
             "is_locked": false,
             "kind": "post",
-            "created_at": "2100-01-01T09:00:00+08:00",
-            "updated_at": "2100-01-01T09:00:00+08:00",
+            "created_at": "2100-01-01T01:00:00Z",
+            "updated_at": "2100-01-01T01:00:00Z",
             "value": "123"
           }
         ],
-        "created_at": "2100-01-01T09:00:00+08:00",
-        "updated_at": "2100-01-01T09:00:00+08:00"
+        "created_at": "2100-01-01T01:00:00Z",
+        "updated_at": "2100-01-01T01:00:00Z"
       }
       """
 
@@ -244,8 +244,8 @@ Feature: policy
             "actions": [
               {
                 "id": "create",
-                "created_at": "2100-01-01T09:00:00+08:00",
-                "updated_at": "2100-01-01T09:00:00+08:00"
+                "created_at": "2100-01-01T01:00:00Z",
+                "updated_at": "2100-01-01T01:00:00Z"
               }
             ],
             "attribute_rules": null,
@@ -255,20 +255,20 @@ Feature: policy
                 "id": "post.123",
                 "is_locked": false,
                 "kind": "post",
-                "created_at": "2100-01-01T09:00:00+08:00",
-                "updated_at": "2100-01-01T09:00:00+08:00",
+                "created_at": "2100-01-01T01:00:00Z",
+                "updated_at": "2100-01-01T01:00:00Z",
                 "value": "123"
               }
             ],
-            "created_at": "2100-01-01T09:00:00+08:00",
-            "updated_at": "2100-01-01T09:00:00+08:00"
+            "created_at": "2100-01-01T01:00:00Z",
+            "updated_at": "2100-01-01T01:00:00Z"
           },
           {
             "actions": [
               {
                 "id": "update",
-                "created_at": "2100-01-01T09:00:00+08:00",
-                "updated_at": "2100-01-01T09:00:00+08:00"
+                "created_at": "2100-01-01T01:00:00Z",
+                "updated_at": "2100-01-01T01:00:00Z"
               }
             ],
             "attribute_rules": null,
@@ -278,13 +278,13 @@ Feature: policy
                 "id": "post.123",
                 "is_locked": false,
                 "kind": "post",
-                "created_at": "2100-01-01T09:00:00+08:00",
-                "updated_at": "2100-01-01T09:00:00+08:00",
+                "created_at": "2100-01-01T01:00:00Z",
+                "updated_at": "2100-01-01T01:00:00Z",
                 "value": "123"
               }
             ],
-            "created_at": "2100-01-01T09:00:00+08:00",
-            "updated_at": "2100-01-01T09:00:00+08:00"
+            "created_at": "2100-01-01T01:00:00Z",
+            "updated_at": "2100-01-01T01:00:00Z"
           }
         ],
         "page": 0,

@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/gogf/gf/v2/frame/g"
+	"github.com/gogf/gf/v2/util/gmode"
 	"github.com/vulcangz/gf2-authz/internal/lib/attribute"
 	"github.com/vulcangz/gf2-authz/internal/lib/ctime"
 	"github.com/vulcangz/gf2-authz/internal/lib/orm"
@@ -75,7 +77,16 @@ func (c *compiler) CompilePolicy(ctx context.Context, policy *entity.Policy) err
 		return nil
 	}
 
-	version := c.clock.Now().Unix()
+	// version := c.clock.Now().Unix()
+	var version int64
+	if gmode.IsTesting() {
+		g.Dump("===CompilePolicy: IsTesting===")
+		version = ctime.NewStaticClock().Now().Unix()
+	} else {
+		g.Dump("===CompilePolicy: prod===")
+		version = c.clock.Now().Unix()
+	}
+	g.Dump("===CompilePolicy: version===", version)
 
 	var compiled = make([]*entity.CompiledPolicy, 0)
 	for _, resource := range policy.Resources {
@@ -112,7 +123,12 @@ func (c *compiler) CompilePolicy(ctx context.Context, policy *entity.Policy) err
 }
 
 func (c *compiler) compilePolicyAttributes(policy *entity.Policy) error {
-	version := c.clock.Now().Unix()
+	var version int64
+	if gmode.IsTesting() {
+		version = ctime.NewStaticClock().Now().Unix()
+	} else {
+		version = c.clock.Now().Unix()
+	}
 
 	for _, attributeRuleStr := range policy.AttributeRules.Data() {
 		attributeRule, err := attribute.ConvertStringToRuleOperator(attributeRuleStr)

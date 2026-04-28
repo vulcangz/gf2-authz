@@ -49,22 +49,22 @@ Feature: compiled
         "data": [
           {
             "action_id": "delete",
-            "created_at": "2100-01-01T09:00:00+08:00",
+            "created_at": "2100-01-01T01:00:00Z",
             "policy_id": "my-post-policy",
             "principal_id": "my-principal",
             "resource_kind": "post",
             "resource_value": "123",
-            "updated_at": "2100-01-01T09:00:00+08:00",
+            "updated_at": "2100-01-01T01:00:00Z",
             "version": 4102448400
           },
           {
             "action_id": "update",
-            "created_at": "2100-01-01T09:00:00+08:00",
+            "created_at": "2100-01-01T01:00:00Z",
             "policy_id": "my-post-policy",
             "principal_id": "my-principal",
             "resource_kind": "post",
             "resource_value": "123",
-            "updated_at": "2100-01-01T09:00:00+08:00",
+            "updated_at": "2100-01-01T01:00:00Z",
             "version": 4102448400
           }
         ],
