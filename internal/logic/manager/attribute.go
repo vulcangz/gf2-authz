@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/gogf/gf/v2/util/gconv"
 	"github.com/vulcangz/gf2-authz/internal/lib/database"
 	"github.com/vulcangz/gf2-authz/internal/lib/orm"
 	"github.com/vulcangz/gf2-authz/internal/model/entity"
@@ -35,13 +36,8 @@ func (m *sAttributeManager) GetRepository() orm.AttributeRepository {
 
 func (m *sAttributeManager) MapToSlice(ctx context.Context, attributes map[string]any) ([]*entity.Attribute, error) {
 	var attributeObjects = make([]*entity.Attribute, 0)
-
 	for attributeKey, attributeValue := range attributes {
-		value, err := CastAnyToString(attributeValue)
-		if err != nil {
-			return nil, fmt.Errorf("unable to cast attribute value to string: %v", err)
-		}
-
+		value := gconv.String(attributeValue)
 		attribute, err := m.repository.GetByFields(map[string]orm.FieldValue{
 			"key_name": {Operator: "=", Value: attributeKey},
 			"value":    {Operator: "=", Value: value},
