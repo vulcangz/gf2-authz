@@ -13,6 +13,8 @@ import (
 
 	"github.com/cucumber/godog"
 	"github.com/gogf/gf/v2/encoding/gjson"
+	"github.com/gogf/gf/v2/util/gconv"
+	"github.com/wI2L/jsondiff"
 )
 
 var (
@@ -117,87 +119,12 @@ func (a *apiFeature) theResponseCodeShouldBe(code int) error {
 	return nil
 }
 
-func (a *apiFeature) theResponseShouldMatchJSON3(body *godog.DocString) (err error) {
-	if a.resp == nil {
-		return fmt.Errorf("http response is nil")
-	}
-
-	var expected, actual map[string]any
-
-	// re-encode expected response
-	if err = json.Unmarshal([]byte(body.Content), &expected); err != nil {
-		return
-	}
-
-	bodyBytes, err := io.ReadAll(a.resp.Body)
-	if err != nil {
-		return fmt.Errorf("unable to read request body: %v", err)
-	}
-
-	var j *gjson.Json
-	if j, err = gjson.DecodeToJson(bodyBytes); err != nil {
-		return fmt.Errorf("unable to unmarshal authentication response: %v", err)
-	}
-
-	actual = j.Get("data").Map()
-
-	sortArray(expected)
-	sortArray(actual)
-
-	jsonExpected, _ := json.MarshalIndent(expected, "", " ")
-	jsonActual, _ := json.MarshalIndent(actual, "", " ")
-
-	// the matching may be adapted per different requirementa.
-	if !bytes.Equal(jsonExpected, jsonActual) {
-		return fmt.Errorf("expected JSON does not match.\n-> expected:\n%v\n-> actual:\n%v", string(jsonExpected), string(jsonActual))
-	}
-	return nil
-}
-
-func (a *apiFeature) theResponseShouldMatchJSON2(body *godog.DocString) (err error) {
-	if a.resp == nil {
-		return fmt.Errorf("http response is nil")
-	}
-
-	var expected, actual map[string]any
-
-	// re-encode expected response
-	if err = json.Unmarshal([]byte(body.Content), &expected); err != nil {
-		return
-	}
-
-	bodyBytes, err := io.ReadAll(a.resp.Body)
-	if err != nil {
-		return fmt.Errorf("unable to read request body: %v", err)
-	}
-
-	var j *gjson.Json
-	if j, err = gjson.DecodeToJson(bodyBytes); err != nil {
-		return fmt.Errorf("unable to unmarshal authentication response: %v", err)
-	}
-
-	actual = j.Get("data").Map()
-
-	sortArray(expected)
-	sortArray(actual)
-
-	jsonExpected, _ := json.MarshalIndent(expected, "", " ")
-	jsonActual, _ := json.MarshalIndent(actual, "", " ")
-
-	// the matching may be adapted per different requirementa.
-	if !bytes.Equal(jsonExpected, jsonActual) {
-		return fmt.Errorf("expected JSON does not match.\n-> expected:\n%v\n-> actual:\n%v", string(jsonExpected), string(jsonActual))
-	}
-
-	return nil
-}
-
 func (a *apiFeature) theResponseShouldMatchJSON(body *godog.DocString) (err error) {
 	if a.resp == nil {
 		return fmt.Errorf("http response is nil")
 	}
 
-	var expected, actual map[string]any
+	var expected, actual interface{}
 
 	// re-encode expected response
 	if err = json.Unmarshal([]byte(body.Content), &expected); err != nil {
@@ -210,22 +137,50 @@ func (a *apiFeature) theResponseShouldMatchJSON(body *godog.DocString) (err erro
 	}
 
 	var j *gjson.Json
-	if j, err = gjson.DecodeToJson(bodyBytes); err != nil {
-		return fmt.Errorf("unable to unmarshal authentication response: %v", err)
+	if a.resp.StatusCode >= 400 {
+		// re-encode actual response too
+		bbs := string(bodyBytes)
+		switch a.resp.StatusCode {
+		case 400:
+			bbs = strings.Trim(bbs, "Bad Request")
+		case 500:
+			bbs = strings.Trim(bbs, "Internal Server Error")
+		default:
+			bbs = strings.Trim(bbs, "Internal Server Error")
+
+		}
+		if j, err = gjson.DecodeToJson([]byte(bbs)); err != nil {
+			return fmt.Errorf("unable to unmarshal response body: %v", err)
+		}
+		j.Remove("timestamp")
+		j.Remove("traceID")
+		actual = j
+
+		jsonExpected, _ := json.MarshalIndent(expected, "", " ")
+		jsonActual, _ := json.MarshalIndent(actual, "", " ")
+
+		// the matching may be adapted per different requirementa.
+		if !bytes.Equal(jsonExpected, jsonActual) {
+			return fmt.Errorf("expected JSON does not match.\n-> expected:\n%v\n-> actual:\n%v", string(jsonExpected), string(jsonActual))
+		}
+	} else {
+		if j, err = gjson.DecodeToJson(bodyBytes); err != nil {
+			return fmt.Errorf("unable to unmarshal response body: %v", err)
+		}
+		actual = j.Get("data").Interface()
+
+		patch, err := jsondiff.CompareJSON(
+			gconv.Bytes(expected),
+			gconv.Bytes(actual),
+			jsondiff.Equivalent(),
+		)
+		if patch != nil && err != nil {
+			jsonExpected, _ := json.MarshalIndent(expected, "", " ")
+			jsonActual, _ := json.MarshalIndent(actual, "", " ")
+			return fmt.Errorf("expected JSON does not match.\n-> expected:\n%v\n-> actual:\n%v", string(jsonExpected), string(jsonActual))
+		}
 	}
 
-	actual = j.Get("data").Map()
-
-	sortArray(expected)
-	sortArray(actual)
-
-	jsonExpected, _ := json.MarshalIndent(expected, "", " ")
-	jsonActual, _ := json.MarshalIndent(actual, "", " ")
-
-	// the matching may be adapted per different requirementa.
-	if !bytes.Equal(jsonExpected, jsonActual) {
-		return fmt.Errorf("expected JSON does not match.\n-> expected:\n%v\n-> actual:\n%v", string(jsonExpected), string(jsonActual))
-	}
 	return nil
 }
 

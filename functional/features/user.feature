@@ -9,6 +9,7 @@ Feature: user
     And the response should match json:
       """
       {
+        "code": 400,
         "error": true,
         "message": "a user cannot delete their own account"
       }

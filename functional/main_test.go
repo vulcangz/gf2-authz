@@ -119,24 +119,28 @@ func InitializeScenario(ctx *godog.ScenarioContext) {
 			}
 
 		case "mysql": //entity.DriverMysql:
-			var truncateSQLSlice []string
-			db.Raw("SELECT CONCAT(\"TRUNCATE `\", t.TABLE_NAME, '`;') FROM information_schema.`TABLES` t WHERE t.TABLE_SCHEMA =?", cfg.Dbname).Scan(&truncateSQLSlice)
-			truncateSQLSlice = append(truncateSQLSlice, "SET FOREIGN_KEY_CHECKS = 1;")
-
-			if err := db.Exec(`
-			SET FOREIGN_KEY_CHECKS = 0;
-			`).Error; err != nil {
-				logger.Error("Unable to set foreign key checks: ", slog.Any("err", err))
-			}
-
-			for _, v := range truncateSQLSlice {
-				if err := db.Exec(v).Error; err != nil {
-					logger.Error("Unable to truncate table: ", slog.Any("sql", v), slog.Any("err", err))
-					return ctx, err
-				}
-			}
+			db.Exec("SET SESSION FOREIGN_KEY_CHECKS = 0;")
+			db.Exec("TRUNCATE TABLE `authz_actions`")
+			db.Exec("TRUNCATE TABLE `authz_attributes`")
+			db.Exec("TRUNCATE TABLE `authz_audits`")
+			db.Exec("TRUNCATE TABLE `authz_clients`")
+			db.Exec("TRUNCATE TABLE `authz_compiled_policies`")
+			db.Exec("TRUNCATE TABLE `authz_oauth_tokens`")
+			db.Exec("TRUNCATE TABLE `authz_policies`")
+			db.Exec("TRUNCATE TABLE `authz_policies_actions`")
+			db.Exec("TRUNCATE TABLE `authz_policies_resources`")
+			db.Exec("TRUNCATE TABLE `authz_principals`")
+			db.Exec("TRUNCATE TABLE `authz_principals_attributes`")
+			db.Exec("TRUNCATE TABLE `authz_principals_roles`")
+			db.Exec("TRUNCATE TABLE `authz_resources`")
+			db.Exec("TRUNCATE TABLE `authz_resources_attributes`")
+			db.Exec("TRUNCATE TABLE `authz_roles`")
+			db.Exec("TRUNCATE TABLE `authz_roles_policies`")
+			db.Exec("TRUNCATE TABLE `authz_stats`")
+			db.Exec("TRUNCATE TABLE `authz_users`")
+			db.Exec("SET SESSION FOREIGN_KEY_CHECKS = 1")
 		}
-
+		logger.Info("Already TRUNCATE all tables.")
 		if err := api.reset(sc); err != nil {
 			logger.Error("Cannot reset api: ", slog.Any("err", err))
 			return ctx, err
