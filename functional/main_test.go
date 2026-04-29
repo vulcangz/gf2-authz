@@ -44,7 +44,7 @@ var (
 
 func init() {
 	godog.BindCommandLineFlags("godog.", &opts)
-	appName = "authz" // g.Cfg().MustGet(context.Background(), "app.name").String()
+	appName = "authz"
 
 	db = database.GetDatabase(context.Background())
 	logger = slog.New(slog.NewTextHandler(os.Stderr, nil))
@@ -62,14 +62,22 @@ func TestMain(m *testing.M) {
 	initializer = fixtures.NewInitializer(cfg)
 
 	status := godog.TestSuite{
-		Name:                appName,
-		ScenarioInitializer: InitializeScenario,
-		Options:             &opts,
+		Name:                 appName,
+		TestSuiteInitializer: InitializeTestSuite,
+		ScenarioInitializer:  InitializeScenario,
+		Options:              &opts,
 	}.Run()
 
 	if status != 0 {
 		os.Exit(1)
 	}
+}
+
+func InitializeTestSuite(ctx *godog.TestSuiteContext) {
+	ctx.BeforeSuite(func() {
+		// drop all tables in the database.
+		dropAll()
+	})
 }
 
 func InitializeScenario(ctx *godog.ScenarioContext) {
@@ -78,68 +86,9 @@ func InitializeScenario(ctx *godog.ScenarioContext) {
 		logger:     logger,
 	}
 
-	//mysql
 	ctx.Before(func(ctx context.Context, sc *godog.Scenario) (context.Context, error) {
-		cfg, _ := service.SysConfig().GetDatabase(context.Background())
-		switch cfg.Driver {
-		case "sqlite": //entity.DriverSqlite:
-			var truncateSQLSlice []string
-			db.Raw("SELECT CONCAT(\"DELETE FROM `\", NAME, '`;') FROM sqlite_master WHERE type='table' AND name like 'authz_%'").Scan(&truncateSQLSlice)
-			truncateSQLSlice = append(truncateSQLSlice, "PRAGMA foreign_keys = ON;")
-
-			if err := db.Exec(`
-			PRAGMA foreign_keys = OFF;
-			`).Error; err != nil {
-				logger.Error("Unable to set foreign key checks: ", slog.Any("err", err))
-			}
-
-			for _, v := range truncateSQLSlice {
-				if err := db.Exec(v).Error; err != nil {
-					logger.Error("Unable to truncate table: ", slog.Any("sql", v), slog.Any("err", err))
-					return ctx, err
-				}
-			}
-
-		case "postgres": //entity.DriverPostgres:
-			var truncateSQLSlice []string
-			db.Raw("SELECT CONCAT(\"TRUNCATE TABLE `\", t.TABLE_NAME, '`;') FROM information_schema.`TABLES` t WHERE t.TABLE_SCHEMA =?", cfg.Dbname).Scan(&truncateSQLSlice)
-			truncateSQLSlice = append(truncateSQLSlice, "SET FOREIGN_KEY_CHECKS = 1;")
-
-			if err := db.Exec(`
-			SET FOREIGN_KEY_CHECKS = 0;
-			`).Error; err != nil {
-				logger.Error("Unable to set foreign key checks: ", slog.Any("err", err))
-			}
-
-			for _, v := range truncateSQLSlice {
-				if err := db.Exec(v).Error; err != nil {
-					logger.Error("Unable to truncate table: ", slog.Any("sql", v), slog.Any("err", err))
-					return ctx, err
-				}
-			}
-
-		case "mysql": //entity.DriverMysql:
-			db.Exec("SET SESSION FOREIGN_KEY_CHECKS = 0;")
-			db.Exec("TRUNCATE TABLE `authz_actions`")
-			db.Exec("TRUNCATE TABLE `authz_attributes`")
-			db.Exec("TRUNCATE TABLE `authz_audits`")
-			db.Exec("TRUNCATE TABLE `authz_clients`")
-			db.Exec("TRUNCATE TABLE `authz_compiled_policies`")
-			db.Exec("TRUNCATE TABLE `authz_oauth_tokens`")
-			db.Exec("TRUNCATE TABLE `authz_policies`")
-			db.Exec("TRUNCATE TABLE `authz_policies_actions`")
-			db.Exec("TRUNCATE TABLE `authz_policies_resources`")
-			db.Exec("TRUNCATE TABLE `authz_principals`")
-			db.Exec("TRUNCATE TABLE `authz_principals_attributes`")
-			db.Exec("TRUNCATE TABLE `authz_principals_roles`")
-			db.Exec("TRUNCATE TABLE `authz_resources`")
-			db.Exec("TRUNCATE TABLE `authz_resources_attributes`")
-			db.Exec("TRUNCATE TABLE `authz_roles`")
-			db.Exec("TRUNCATE TABLE `authz_roles_policies`")
-			db.Exec("TRUNCATE TABLE `authz_stats`")
-			db.Exec("TRUNCATE TABLE `authz_users`")
-			db.Exec("SET SESSION FOREIGN_KEY_CHECKS = 1")
-		}
+		// truncate all tables in the database.
+		truncateAll()
 
 		if err := api.reset(sc); err != nil {
 			logger.Error("Cannot reset api: ", slog.Any("err", err))
@@ -173,4 +122,77 @@ func InitializeScenario(ctx *godog.ScenarioContext) {
 	ctx.Step(`^I send "(GET|POST|PUT|DELETE)" request to "([^"]*)" with payload:$`, api.iSendRequestToWithPayload)
 	ctx.Step(`^the response code should be (\d+)$`, api.theResponseCodeShouldBe)
 	ctx.Step(`^the response should match json:$`, api.theResponseShouldMatchJSON)
+}
+
+// tableNames return all table names in the database.
+func tableNames() ([]string, error) {
+	var tx *gorm.DB
+
+	cfg, _ := service.SysConfig().GetDatabase(context.Background())
+	dbname := cfg.Dbname
+	switch cfg.Driver {
+	case "sqlite":
+		tx = db.Table("sqlite_master").
+			Select("tbl_name").
+			Where("type = ?", "table").
+			Where("tbl_name NOT LIKE ?", "sqlite_%")
+	case "postgres":
+		dbname = "public"
+		fallthrough
+	default:
+		tx = db.Table("information_schema.tables").
+			Select("table_name").
+			Where("table_type = ?", "BASE TABLE").
+			Where("table_schema = ?", dbname)
+	}
+
+	var names []string
+	err := tx.Scan(&names).Error
+	if err != nil {
+		return nil, err
+	}
+	return names, nil
+}
+
+// truncateAll truncate all tables in the database.
+func truncateAll() error {
+	return db.Transaction(func(tx *gorm.DB) error {
+		names, err := tableNames()
+		if err != nil {
+			return err
+		}
+		if tx.Name() == "mysql" {
+			if err = tx.Exec("SET FOREIGN_KEY_CHECKS = 0").Error; err != nil {
+				return err
+			}
+			defer tx.Exec("SET FOREIGN_KEY_CHECKS = 1")
+		}
+		for _, name := range names {
+			raw := "TRUNCATE TABLE " + name
+			if tx.Name() == "sqlite" {
+				raw = "DELETE FROM " + name
+			}
+			if err = tx.Exec(raw).Error; err != nil {
+				return err
+			}
+		}
+		return nil
+	})
+}
+
+// dropAll drop all tables in the database.
+func dropAll() error {
+	return db.Transaction(func(tx *gorm.DB) error {
+		names, err := tableNames()
+		if err != nil {
+			return err
+		}
+		for _, name := range names {
+			raw := "DROP TABLE " + name
+			if err = tx.Exec(raw).Error; err != nil {
+				return err
+			}
+		}
+		return nil
+	})
 }

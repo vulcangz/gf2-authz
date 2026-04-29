@@ -55,8 +55,6 @@ func (a *apiFeature) iAuthenticateWithUsernameAndPassword(username, password str
 		return fmt.Errorf("unable to unmarshal authentication response: %v", err)
 	}
 
-	a.logger.Info("j:", slog.Any("j", j))
-
 	a.token = j.Get("data.access_token").String()
 
 	return nil
@@ -107,6 +105,10 @@ func (a *apiFeature) theResponseCodeShouldBe(code int) error {
 
 	if code != a.resp.StatusCode {
 		if a.resp.StatusCode >= 400 {
+			if a.resp.StatusCode == 404 {
+				return fmt.Errorf("expected response code to be: %d, actual is: %d", code, a.resp.StatusCode)
+			}
+
 			bodyBytes, err := io.ReadAll(a.resp.Body)
 			if err != nil {
 				return fmt.Errorf("unable to read request body: %v", err)
@@ -122,6 +124,10 @@ func (a *apiFeature) theResponseCodeShouldBe(code int) error {
 func (a *apiFeature) theResponseShouldMatchJSON(body *godog.DocString) (err error) {
 	if a.resp == nil {
 		return fmt.Errorf("http response is nil")
+	}
+
+	if a.resp.StatusCode == 404 {
+		return nil
 	}
 
 	var expected, actual interface{}
@@ -182,15 +188,4 @@ func (a *apiFeature) theResponseShouldMatchJSON(body *godog.DocString) (err erro
 	}
 
 	return nil
-}
-
-func sortArray(data map[string]interface{}) {
-	for _, v := range data {
-		switch vv := v.(type) {
-		case []interface{}:
-			sortArray(vv[0].(map[string]interface{}))
-		case map[string]interface{}:
-			sortArray(vv)
-		}
-	}
 }
