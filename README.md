@@ -1,5 +1,7 @@
 # gf2-authz - GoFrame v2 + GORM + React + Material UI
 
+[English Docs](README.md) | [Chinese / 中文文档](README.zh-CN.md)
+
 gf2-auth is a fork of [eko/authz](https://github.com/eko/authz), Backend with GoFrame instead of Fiber, frontend migrated from react-scripts to Vite.
 
 This project brings a backend server with its frontend for managing authorizations.
@@ -89,7 +91,9 @@ that's all you need to get started!
 
 ## Testing
 
-When all features are tested together, the pass rate is close to 91%. However, individual features should pass their tests. 
+- When testing with a MySQL database, 100% passed;
+- When testing with an SQLite database, one scenario failed;
+- PostgreSQL has not yet been tested.
 
 The following tests use a MySQL database.
 
@@ -100,36 +104,31 @@ The following tests use a MySQL database.
 $ export GF_GMODE=testing
 
 $ go test -count=1 --tags=functional -v ./functional
-or just test feature "action", other features: check, compiled, policy, principal, resource, role, user
+
+# or just test feature "action", other features: check, compiled, policy, principal, resource, role, user
 $ go test -count=1 --tags=functional -v ./functional -t @action
 ```
 The test results are similar to the following:
 ```
-2026-04-25T13:09:04.026Z [INFO] database.go:74: mysql database is alive!
+2026-04-29T14:07:49.479Z [INFO] database.go:74: mysql database is alive!
 
-2026-04-25T13:09:04.032Z [INFO] initialize start...
-2026-04-25T13:09:04.035Z [INFO] initializeResources start……
-2026-04-25T13:09:04.108Z [INFO] initializeResources ok.
-2026-04-25T13:09:04.219Z [INFO] initializePolicies ok.
-2026-04-25T13:09:04.247Z [INFO] initializeRoles ok.
-2026-04-25T13:09:04.267Z [INFO] initializeUser start update……
-2026-04-25T13:09:04.276Z [INFO] initialize end.
-2026-04-25T13:09:04.276Z [INFO] {c90e1bc7899ba918939199752b024807} Compiler: subscribed to event dispatchers
-2026-04-25T13:09:04.302Z [INFO] pid[15662]: http server started listening on [:8080]
-2026-04-25T13:09:04.302Z [INFO] swagger ui is serving at address: http://127.0.0.1:8080/swagger/
-2026-04-25T13:09:04.306Z [INFO] openapi specification is serving at address: http://127.0.0.1:8080/api.json
+2026-04-29T14:07:49.493Z [INFO] checkAlreadyInitialized update password ok.
+2026-04-29T14:07:49.494Z [INFO] {dba3bee110d9aa1830e29b2dd23aa57e} Compiler: subscribed to event dispatchers
+2026-04-29T14:07:49.512Z [INFO] pid[52582]: http server started listening on [:8080]
+2026-04-29T14:07:49.512Z [INFO] swagger ui is serving at address: http://127.0.0.1:8080/swagger/
+2026-04-29T14:07:49.512Z [INFO] openapi specification is serving at address: http://127.0.0.1:8080/api.json
 Feature: action
   Test action-related APIs
-2026-04-28T11:50:01.189Z [INFO] initialize start...
+2026-04-29T14:07:50.065Z [INFO] initialize end.
 ...
-29 scenarios (27 passed, 2 failed)
-256 steps (234 passed, 2 failed, 20 skipped)
-34.388410065s
-FAIL    github.com/vulcangz/gf2-authz/functional        35.027s
-FAIL
+29 scenarios (29 passed)
+256 steps (256 passed)
+22.787520128s
+ok      github.com/vulcangz/gf2-authz/functional        23.127s
 ```
 
-## Credits
+## Acknowledgments
 
 - [eko/authz](https://github.com/eko/authz)
 - [GoFrame](https://github.com/gogf/gf)
+- [Gothic](https://github.com/jrapoport/gothic): methods TruncateAll(), DropAll()
