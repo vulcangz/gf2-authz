@@ -57,8 +57,6 @@ func NewInitializer(
 
 // Initialize initializes default application resources.
 func (i *initializer) Initialize() error {
-	g.Log().Info(ctx, "initialize start...")
-
 	appCfg, _ := service.SysConfig().GetApp(ctx)
 	appName = appCfg.Name
 	defaultAdminPassword = i.cfg.AdminDefaultPassword
@@ -107,7 +105,6 @@ func (i *initializer) Initialize() error {
 }
 
 func (i *initializer) initializeResources() error {
-	g.Log().Info(ctx, "initializeResources start……")
 	for resourceType := range resources {
 		resource, err := service.ResourceManager().Create(
 			ctx,
@@ -127,7 +124,6 @@ func (i *initializer) initializeResources() error {
 		}
 	}
 
-	g.Log().Info(ctx, "initializeResources ok.")
 	return nil
 }
 
@@ -138,7 +134,6 @@ func (i *initializer) checkAlreadyInitialized() bool {
 
 	if err == nil && adminUser != nil {
 		_ = service.UserManager().UpdatePassword(defaultAdminUsername, defaultAdminPassword)
-		g.Log().Info(ctx, "checkAlreadyInitialized update password ok.")
 		return true
 	}
 
@@ -163,7 +158,6 @@ func (i *initializer) initializePolicies() error {
 		i.policies = append(i.policies, policy.ID)
 	}
 
-	g.Log().Info(ctx, "initializePolicies ok.")
 	return nil
 }
 
@@ -177,7 +171,6 @@ func (i *initializer) initializeRoles() error {
 		return err
 	}
 
-	g.Log().Info(ctx, "initializeRoles ok.")
 	return nil
 }
 
@@ -222,6 +215,5 @@ func (i *initializer) initializeUser() error {
 
 	principal.Roles = []*entity.Role{role}
 
-	g.Log().Info(ctx, "initializeUser start update……")
 	return service.PrincipalManager().GetRepository().Update(principal)
 }

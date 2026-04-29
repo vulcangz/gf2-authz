@@ -92,7 +92,7 @@ func (m *sUserManager) Create(ctx context.Context, username string, password str
 		ID: entity.UserPrincipal(user.Username),
 	}); err != nil {
 		_ = transaction.Rollback()
-		return nil, fmt.Errorf("unable to create user: %v", err)
+		return nil, fmt.Errorf("unable to create principal: %v", err)
 	}
 
 	return user, nil
