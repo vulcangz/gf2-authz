@@ -1,6 +1,6 @@
 # gf2-authz - GoFrame v2 + GORM + React + Material UI
 
-[English Docs](README.md) | [Chinese / 中文文档](README.zh-CN.md)
+**其他语言版本: [English Docs](README.md) | [Chinese / 中文文档](README.zh-CN.md)
 
 gf2-auth 是 [eko/authz](https://github.com/eko/authz) 的复刻版。后端使用 GoFrame 框架替代了 Fiber，前端构建工具从 react-scripts 迁移到 Vite。
 
@@ -95,9 +95,11 @@ go run main.go
 
 ## 测试
 
-- 使用 MySQL 数据库测试时，100% 通过；
-- 使用 SQLite 数据库测试时，有一个场景失败；
-- PostgreSQL 尚未经过测试。
+- 使用 MySQL 数据库测试时，结论："29 scenarios (29 passed). 256 steps (256 passed)"；
+- 使用 PostgreSQL 数据库测试时，结论："29 scenarios (29 passed). 256 steps (256 passed)"；
+- 使用 SQLite 数据库测试时，结论："29 scenarios (29 passed). 256 steps (256 passed)"。
+
+在一台开发机上（Intel(R) Core(TM) i5-4570 CPU/虚拟机/2核/10GB内存），完成一次全部功能（features）测试, MySQL 用时约 23~25s，PostgreSQL 约 13~14s，SQLite 约 7~8s。
 
 以下测试使用 MySQL 数据库。
 

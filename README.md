@@ -1,6 +1,6 @@
 # gf2-authz - GoFrame v2 + GORM + React + Material UI
 
-[English Docs](README.md) | [Chinese / 中文文档](README.zh-CN.md)
+**Read this in other languages: [English Docs](README.md) | [Chinese / 中文文档](README.zh-CN.md)
 
 gf2-auth is a fork of [eko/authz](https://github.com/eko/authz), Backend with GoFrame instead of Fiber, frontend migrated from react-scripts to Vite.
 
@@ -91,9 +91,11 @@ that's all you need to get started!
 
 ## Testing
 
-- When testing with a MySQL database, 100% passed;
-- When testing with an SQLite database, one scenario failed;
-- PostgreSQL has not yet been tested.
+- When testing with a MySQL database, "29 scenarios (29 passed). 256 steps (256 passed)";
+- When testing with a PostgreSQL database, "29 scenarios (29 passed). 256 steps (256 passed)";
+- When testing with an SQLite database, "29 scenarios (29 passed). 256 steps (256 passed)".
+
+On a development machine (Intel® Core™ i5-4570 CPU, virtual machine, 2 cores, 10 GB RAM), a full features test took approximately 23–25 seconds for MySQL, 13–14 seconds for PostgreSQL, and 7–8 seconds for SQLite.
 
 The following tests use a MySQL database.
 
