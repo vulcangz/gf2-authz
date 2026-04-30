@@ -172,6 +172,9 @@ func truncateAll() error {
 			if tx.Name() == "sqlite" {
 				raw = "DELETE FROM " + name
 			}
+			if tx.Name() == "postgres" {
+				raw = "TRUNCATE TABLE " + name + " RESTART IDENTITY CASCADE;"
+			}
 			if err = tx.Exec(raw).Error; err != nil {
 				return err
 			}
